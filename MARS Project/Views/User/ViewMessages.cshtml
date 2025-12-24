@@ -1,0 +1,50 @@
+﻿
+@{
+    ViewData["Title"] = "ViewMessages";
+}
+
+@* <h1>ViewMessages</h1> *@
+
+
+@if (TempData["msg1"] != null)
+{
+    <div class="alert alert-info">@TempData["msg1"]</div>
+}
+
+
+
+
+
+
+@if (TempData["Regenerate"] != null)
+{
+    <div class="alert alert-success">
+        @Html.Raw(TempData["Regenerate"])
+    </div>
+}
+
+<br />
+
+
+@if (TempData["msg2"] != null)
+{
+    <div class="alert alert-success">
+        @Html.Raw(TempData["msg2"])
+    </div>
+}
+
+
+@if (TempData["verify"] != null)
+{
+    <div class="alert alert-success">
+        @Html.Raw(TempData["verify"])
+        
+    </div>
+}
+
+
+
+
+<a href="@Url.Action("Login", "Account")">Go to Login</a>
+
+
