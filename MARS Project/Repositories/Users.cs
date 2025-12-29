@@ -1,10 +1,11 @@
-﻿
-using Humanizer;
+﻿using Humanizer;
 using MARS_Project.Connection;
-using MARS_Project.Models;
+using MARS_Project.Models.Citizen;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Data;
+using System.Security.Cryptography;
 using System.Security.Cryptography;
 using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -32,82 +33,121 @@ namespace MARS_Project.Repositories
             using (SqlConnection con = new SqlConnection(_conn.Dbcs))
             {
                 await con.OpenAsync();
-                SqlTransaction transaction = con.BeginTransaction();
 
-                try
+                using (SqlTransaction transaction = con.BeginTransaction())
                 {
-                    // 1️⃣ Insert User & get UserID
-                    string userQuery = @"
-                INSERT INTO dbo.Users
-                (MobileNo, EmailID, EmailVerified, MobileVerified, FirstName, LastName, Status, CreatedBy)
-                VALUES
-                (@MobileNo, @EmailID, 0, 0, @FirstName, @LastName, 0, @CreatedBy);
-                SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-                    SqlCommand userCmd = new SqlCommand(userQuery, con, transaction);
-                    userCmd.Parameters.AddWithValue("@MobileNo", signup.MobileNo);
-                    userCmd.Parameters.AddWithValue("@EmailID", signup.EmailID);
-                    userCmd.Parameters.AddWithValue("@FirstName", signup.FirstName);
-                    userCmd.Parameters.AddWithValue("@LastName", signup.LastName);
-                    userCmd.Parameters.AddWithValue("@CreatedBy", signup.FirstName);
-
-                    int userId = (int)await userCmd.ExecuteScalarAsync();
-
-                    // 2️⃣ Get RoleID (Citizen)
-                    string roleQuery = "SELECT RoleID FROM dbo.UserRoles WHERE RoleName = @RoleName";
-                    SqlCommand roleCmd = new SqlCommand(roleQuery, con, transaction);
-                    roleCmd.Parameters.AddWithValue("@RoleName", "Citizen");
-
-                    object roleResult = await roleCmd.ExecuteScalarAsync();
-                    int roleId;
-
-                    if (roleResult == null)
+                    try
                     {
-                        // Insert role if not exists
-                        string insertRole = @"
-                    INSERT INTO dbo.UserRoles (RoleName)
-                    VALUES (@RoleName);
+                        // 1️⃣ Insert User
+                        string userQuery = @"
+                    INSERT INTO dbo.Users
+                    (MobileNo, EmailID, EmailVerified, MobileVerified, FirstName, LastName, Status, CreatedBy)
+                    VALUES
+                    (@MobileNo, @EmailID, 0, 0, @FirstName, @LastName, 0, @CreatedBy);
                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
-                        SqlCommand insertRoleCmd = new SqlCommand(insertRole, con, transaction);
-                        insertRoleCmd.Parameters.AddWithValue("@RoleName", "Citizen");
-                        roleId = (int)await insertRoleCmd.ExecuteScalarAsync();
+                        using SqlCommand userCmd = new SqlCommand(userQuery, con, transaction);
+                        userCmd.Parameters.Add("@MobileNo", SqlDbType.VarChar).Value = signup.MobileNo;
+                        userCmd.Parameters.Add("@EmailID", SqlDbType.VarChar).Value = signup.EmailID;
+                        userCmd.Parameters.Add("@FirstName", SqlDbType.VarChar).Value = signup.FirstName;
+                        userCmd.Parameters.Add("@LastName", SqlDbType.VarChar).Value = signup.LastName;
+                        userCmd.Parameters.Add("@CreatedBy", SqlDbType.VarChar).Value = signup.FirstName;
+
+                        int userId = Convert.ToInt32(await userCmd.ExecuteScalarAsync());
+
+                        // 2️⃣ Get or Create Role
+                        string roleName = "Citizen";
+
+                        string roleQuery = "SELECT RoleID FROM dbo.UserRoles WHERE RoleName = @RoleName";
+                        using SqlCommand roleCmd = new SqlCommand(roleQuery, con, transaction);
+                        roleCmd.Parameters.Add("@RoleName", SqlDbType.VarChar).Value = roleName;
+
+                        object roleResult = await roleCmd.ExecuteScalarAsync();
+                        int roleId;
+
+                        if (roleResult == null)
+                        {
+                            string insertRoleQuery = @"
+                        INSERT INTO dbo.UserRoles (RoleName)
+                        VALUES (@RoleName);
+                        SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+                            using SqlCommand insertRoleCmd = new SqlCommand(insertRoleQuery, con, transaction);
+                            insertRoleCmd.Parameters.Add("@RoleName", SqlDbType.VarChar).Value = roleName;
+
+                            roleId = Convert.ToInt32(await insertRoleCmd.ExecuteScalarAsync());
+                        }
+                        else
+                        {
+                            roleId = Convert.ToInt32(roleResult);
+                        }
+
+                        // 3️⃣ Map User to Role
+                        string mapQuery = @"
+                    INSERT INTO dbo.UserRoleMapping (UserID, RoleID, AssignedAt)
+                    VALUES (@UserID, @RoleID, @AssignedAt)";
+
+                        using SqlCommand mapCmd = new SqlCommand(mapQuery, con, transaction);
+                        mapCmd.Parameters.Add("@UserID", SqlDbType.Int).Value = userId;
+                        mapCmd.Parameters.Add("@RoleID", SqlDbType.Int).Value = roleId;
+                        mapCmd.Parameters.Add("@AssignedAt", SqlDbType.DateTime).Value = DateTime.UtcNow;
+
+                        await mapCmd.ExecuteNonQueryAsync();
+
+                        transaction.Commit();
+                        return 1;
                     }
-                    else
+                    catch (Exception)
                     {
-                        roleId = Convert.ToInt32(roleResult);
+                        transaction.Rollback();
+                        return 0;
                     }
-
-                    // 3️⃣ Map User with Role
-                    string mapQuery = @"
-                INSERT INTO dbo.UserRoleMapping (UserID, RoleID, AssignedAt)
-                VALUES (@UserID, @RoleID, @AssignedAt)";
-
-                    SqlCommand mapCmd = new SqlCommand(mapQuery, con, transaction);
-                    mapCmd.Parameters.AddWithValue("@UserID", userId);
-                    mapCmd.Parameters.AddWithValue("@RoleID", roleId);
-                    mapCmd.Parameters.AddWithValue("@AssignedAt", DateTime.Now);
-
-                    await mapCmd.ExecuteNonQueryAsync();
-
-                    // 4️⃣ Commit
-                    transaction.Commit();
-                    return 1;
-                }
-                catch
-                {
-                    transaction.Rollback();
-                    return 0;
                 }
             }
         }
 
 
 
-        public Task<int> UserLogin(Login login)
+
+        public async Task<int> UserLogin(Login login)
         {
-            return Task.FromResult(0);
+            string passwordHash = ConvertHashPassword(login.Password);
+
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                string query = @"
+            SELECT TOP 1 
+                   U.UserID,
+                   U.Status,
+                   URM.RoleID
+            FROM dbo.Users U
+            INNER JOIN dbo.UserRoleMapping URM ON U.UserID = URM.UserID
+            WHERE U.EmailID = @EmailID
+              AND U.PasswordHash = @PasswordHash";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    // ✅ PARAMETER NAMES MUST MATCH SQL
+                    cmd.Parameters.Add("@EmailID", SqlDbType.NVarChar, 150).Value = login.EmailID;
+                    cmd.Parameters.Add("@PasswordHash", SqlDbType.NVarChar, 512).Value = passwordHash;
+
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (!reader.Read())
+                            return 0;   // Invalid login
+
+                        if (reader.GetByte(reader.GetOrdinal("Status")) != 1)
+                            return -1;  // Inactive user
+
+                        return reader.GetInt32(reader.GetOrdinal("RoleID")); // ✅ ROLE ID
+                    }
+                }
+            }
         }
+
+
 
 
 
@@ -165,7 +205,7 @@ namespace MARS_Project.Repositories
         {
 
             string PasswordHash = Password; //ConvertHashPassword(Password);
-            int result =0;
+            int result = 0;
 
             using (SqlConnection conn = new SqlConnection(_conn.Dbcs))
             {
@@ -177,9 +217,10 @@ namespace MARS_Project.Repositories
                 cmd.Parameters.AddWithValue("@PasswordHash", PasswordHash);
                 conn.Open();
 
-                 result= cmd.ExecuteNonQuery();               
-            }   
-            if(result != 0) {
+                result = cmd.ExecuteNonQuery();
+            }
+            if (result != 0)
+            {
                 using (SqlConnection con = new SqlConnection(_conn.Dbcs))
                 {
                     string query = @"UPDATE dbo.Users  SET LastLoginAt = @LastLoginAt where EmailID = @EmailID and PasswordHash = @PasswordHash";
@@ -194,7 +235,7 @@ namespace MARS_Project.Repositories
 
                     return rowsAffected > 0;
                 }
-                
+
             }
             return false;
         }
@@ -241,17 +282,28 @@ namespace MARS_Project.Repositories
 
 
         // Write a function to Generate Random String for OTP And Password
+
+
         public string GenerateRandomString(int length = 10)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             char[] result = new char[length];
 
-            for (int i = 0; i < length; i++)
-                result[i] = chars[random.Next(chars.Length)];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                byte[] buffer = new byte[length];
+
+                rng.GetBytes(buffer);
+
+                for (int i = 0; i < length; i++)
+                {
+                    result[i] = chars[buffer[i] % chars.Length];
+                }
+            }
 
             return new string(result);
         }
+
 
 
 
@@ -542,7 +594,7 @@ namespace MARS_Project.Repositories
 
         }
 
-       
+
     }
 }
 

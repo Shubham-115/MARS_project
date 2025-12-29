@@ -1,0 +1,182 @@
+[
+  {
+    "division": "Bhopal",
+    "districts": [
+      {
+        "name": "Bhopal",
+        "tehsils": [ "Huzur", "Berasia", "Kolar", "Berasia" ]
+      },
+      {
+        "name": "Raisen",
+        "tehsils": [ "Raisen", "Silwani", "Goharganj", "Begamganj" ]
+      },
+      {
+        "name": "Sehore",
+        "tehsils": [ "Sehore", "Ashta", "Shamshabad", "Baira" ]
+      },
+      {
+        "name": "Vidisha",
+        "tehsils": [ "Vidisha", "Basoda", "Sanchi", "Bhojpur" ]
+      }
+    ]
+  },
+  {
+    "division": "Indore",
+    "districts": [
+      {
+        "name": "Indore",
+        "tehsils": [ "Indore", "Depalpur", "Mhow", "Sanwer" ]
+      },
+      {
+        "name": "Dewas",
+        "tehsils": [ "Dewas", "Sonkatch", "Kannod", "Sihawal" ]
+      },
+      {
+        "name": "Ujjain",
+        "tehsils": [ "Ujjain", "Nagda", "Badnagar", "Tarana" ]
+      },
+      {
+        "name": "Shajapur",
+        "tehsils": [ "Shajapur", "Shujalpur", "Susner" ]
+      },
+      {
+        "name": "Ratlam",
+        "tehsils": [ "Ratlam", "Alot", "Jaora", "Sailana" ]
+      },
+      {
+        "name": "Mandsaur",
+        "tehsils": [ "Mandsaur", "Sardarpur", "Malhargarh" ]
+      },
+      {
+        "name": "Neemuch",
+        "tehsils": [ "Neemuch", "Manasa", "Jawad" ]
+      }
+    ]
+  },
+  {
+    "division": "Gwalior",
+    "districts": [
+      {
+        "name": "Gwalior",
+        "tehsils": [ "Gwalior", "Bhitarwar", "Dabra" ]
+      },
+      {
+        "name": "Bhind",
+        "tehsils": [ "Bhind", "Gohad", "Lahar" ]
+      },
+      {
+        "name": "Datia",
+        "tehsils": [ "Datia", "Seondha", "Bhander" ]
+      },
+      {
+        "name": "Morena",
+        "tehsils": [ "Morena", "Sabalgarh", "Joura" ]
+      }
+    ]
+  },
+  {
+    "division": "Jabalpur",
+    "districts": [
+      {
+        "name": "Jabalpur",
+        "tehsils": [ "Jabalpur", "Sihora", "Majhouli", "Patan" ]
+      },
+      {
+        "name": "Seoni",
+        "tehsils": [ "Seoni", "Keolari", "Lamtara" ]
+      },
+      {
+        "name": "Chhindwara",
+        "tehsils": [ "Chhindwara", "Parasia", "Pandhurna" ]
+      },
+      {
+        "name": "Narsinghpur",
+        "tehsils": [ "Narsinghpur", "Gadarwara", "Shahpura" ]
+      },
+      {
+        "name": "Balaghat",
+        "tehsils": [ "Balaghat", "Waraseoni", "Katangi" ]
+      }
+    ]
+  },
+  {
+    "division": "Rewa",
+    "districts": [
+      {
+        "name": "Rewa",
+        "tehsils": [ "Rewa", "Semariya", "Mangawan" ]
+      },
+      {
+        "name": "Satna",
+        "tehsils": [ "Satna", "Maihar", "Amarpatan" ]
+      },
+      {
+        "name": "Sidhi",
+        "tehsils": [ "Sidhi", "Churhat", "Singrauli" ]
+      },
+      {
+        "name": "Singrauli",
+        "tehsils": [ "Singrauli", "Deosar", "Chitrangi" ]
+      }
+    ]
+  },
+  {
+    "division": "Sagar",
+    "districts": [
+      {
+        "name": "Sagar",
+        "tehsils": [ "Sagar", "Khurai", "Deori", "Nerchowk" ]
+      },
+      {
+        "name": "Damoh",
+        "tehsils": [ "Damoh", "Hatta", "Patera" ]
+      },
+      {
+        "name": "Chhatarpur",
+        "tehsils": [ "Chhatarpur", "Bijawar", "Rajnagar" ]
+      },
+      {
+        "name": "Panna",
+        "tehsils": [ "Panna", "Ajaigarh", "Amanganj" ]
+      }
+    ]
+  },
+  {
+    "division": "Ujjain",
+    "districts": [
+      {
+        "name": "Dhar",
+        "tehsils": [ "Dhar", "Kukshi", "Manawar" ]
+      },
+      {
+        "name": "Ratlam",
+        "tehsils": [ "Ratlam", "Jaora", "Alot" ]
+      },
+      {
+        "name": "Mandsaur",
+        "tehsils": [ "Mandsaur", "Sardarpur", "Malhargarh" ]
+      },
+      {
+        "name": "Shajapur",
+        "tehsils": [ "Shajapur", "Shujalpur", "Susner" ]
+      }
+    ]
+  },
+  {
+    "division": "Sagar",
+    "districts": [
+      {
+        "name": "Sagar",
+        "tehsils": [ "Sagar", "Khurai", "Deori", "Nerchowk" ]
+      },
+      {
+        "name": "Tikamgarh",
+        "tehsils": [ "Tikamgarh", "Niwari", "Palera" ]
+      },
+      {
+        "name": "Damoh",
+        "tehsils": [ "Damoh", "Hatta", "Patera" ]
+      }
+    ]
+  }
+]

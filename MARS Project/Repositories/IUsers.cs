@@ -1,4 +1,4 @@
-﻿using MARS_Project.Models;
+﻿using MARS_Project.Models.Citizen;
 
 namespace MARS_Project.Repositories
 {

@@ -1,16 +1,15 @@
 ﻿using MARS_Project.Connection;
 using MARS_Project.CreateFilters;
 using MARS_Project.DataSecurity;
-using MARS_Project.Models;
-using MARS_Project.Models.Account;
+using MARS_Project.Models.Citizen;
 using MARS_Project.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using PortalLib.Framework.Utilities;
 using System.Threading.Tasks;
-using ForgotPassword = MARS_Project.Models.ForgotPassword;
-using Login = MARS_Project.Models.Login;
+using ForgotPassword = MARS_Project.Models.Citizen.ForgotPassword;
+using Login = MARS_Project.Models.Citizen.Login;
 
 namespace MARS_Project.Controllers
 {
@@ -18,14 +17,14 @@ namespace MARS_Project.Controllers
     public class UserController : Controller
     {
         private readonly IUsers users;
-       
+
         private readonly SecureData secure;
         private readonly TokenGenerate TknG;
         private readonly PortalEncryption encryptdecpt;
         public UserController(IUsers user)
         {
             users = user;// object for Users 
-           
+
             secure = new SecureData();
             TknG = new TokenGenerate();
             encryptdecpt = new PortalEncryption();
@@ -64,8 +63,30 @@ namespace MARS_Project.Controllers
                         string Email = PortalEncryption.EncryptPassword(signUp.EmailID.ToString());
                         string link = Url.Action("VerifyEmail", "User", new { token = token, EmailID = Email }, Request.Scheme);
 
-                        TempData["msg2"] = $@"Your are already Registered Please Veirfy ! <br/>Verification link is valid for 24 hours.<br/> Click below to verify:<br/><br/><a href='{link}' class='btn btn-primary'>Verify Email</a>";
-                        return RedirectToAction("VerifyLink");
+                        TempData["msg2"] = $@"
+<div class='text-center'>
+    <h5 class='mb-3 text-primary'>
+        <i class='bi bi-envelope-check'></i> Email Verification Required
+    </h5>
+
+    <p class='mb-2'>
+        You'r Already Registered With Us .........!
+    </p>
+
+    <p class='mb-2 text-muted'>
+        Please verify your email address to activate your account.
+    </p>
+
+    <p class='fw-semibold'>
+        ⏰ This verification link is valid for <strong>24 hours</strong>.
+    </p>
+
+    <div class='d-grid gap-2 col-8 mx-auto mt-3'>
+        <a href='{link}' class='btn btn-primary btn-lg'>
+            Verify Email
+        </a>
+    </div>
+</div>"; return RedirectToAction("VerifyLink");
 
                     }
                     return RedirectToAction("VerifyEmail");
@@ -93,7 +114,7 @@ namespace MARS_Project.Controllers
                 TempData["msg"] = "User Already Exist ! Please Login ";
                 return RedirectToAction("Login");
 
-               
+
 
             }
 
@@ -109,7 +130,30 @@ namespace MARS_Project.Controllers
                     string Email = PortalEncryption.EncryptPassword(signUp.EmailID.ToString());
                     string link = Url.Action("VerifyEmail", "User", new { token = token, EmailID = Email }, Request.Scheme);
 
-                    TempData["msg2"] = $@"Registration Successful! <br/>Verification link is valid for 24 hours.<br/> Click below to verify:<br/><br/><a href='{link}' class='btn btn-primary'>Verify Email</a>";
+                    TempData["msg2"] = $@"
+<div class='text-center'>
+    <h5 class='mb-3 text-primary'>
+        <i class='bi bi-envelope-check'></i> Email Verification Required
+    </h5>
+
+    <p class='mb-2'>
+        Registration Success full .........!
+    </p>
+
+    <p class='mb-2 text-muted'>
+        Please verify your email address to activate your account.
+    </p>
+
+    <p class='fw-semibold'>
+        ⏰ This verification link is valid for <strong>24 hours</strong>.
+    </p>
+
+    <div class='d-grid gap-2 col-8 mx-auto mt-3'>
+        <a href='{link}' class='btn btn-primary btn-lg'>
+            Verify Email
+        </a>
+    </div>
+</div>";
                     return RedirectToAction("VerifyLink");
 
                 }
@@ -194,7 +238,7 @@ namespace MARS_Project.Controllers
                     EmailID = PortalEncryption.EncryptPassword(EmailID.ToString());
                     TempData["msg1"] = "Link expired or invalid token.";
                     string link1 = Url.Action("GenereateToken", "User", new { EmailID = EmailID }, Request.Scheme);
-                    TempData["Regenerate"] = $"Invalid Verification Token or Time Out!<br/>Click below to Resend link :<br/><a href='{link1}'>{link1}</a>";
+                    TempData["Regenerate"] = $"Invalid Verification Token or Time Out!<br/>Click below to Resend link :<br/><a href='{link1}'class ='btn btn-danger'>Resend</a>";
                     return RedirectToAction("ViewMessages");
                 }
             }
@@ -325,12 +369,6 @@ namespace MARS_Project.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginAsync(Login login)
         {
-
-            if (HttpContext.Session.GetString(login.EmailID) != null)
-            {
-                return RedirectToAction("Dashboard", "Home");
-            }
-
             if (ModelState.IsValid)
             {
 
@@ -360,25 +398,31 @@ namespace MARS_Project.Controllers
                 }
 
                 // convert the plain password string to HashPassword string
-                string Password = users.ConvertHashPassword(login.Password);
 
-                if (users.VerifyEmailPassword(login.EmailID, Password))
-                {
-                    HttpContext.Session.SetString("EmailID", Email);
-                    users.UpdateLoginTime(Email);
+                int loginUser = await users.UserLogin(login);
+               
+                    switch (loginUser)
+                    {
+                        case 1:
 
-                    return RedirectToAction("Dashbord");
-                }
-                else
-                {
+                            HttpContext.Session.SetString("EmailID", Email);
+                            users.UpdateLoginTime(Email);
+                            return RedirectToAction("Dashbord", "User");
+                            break;
+                        case 2:
+                            HttpContext.Session.SetString("EmailID", Email);
+                            users.UpdateLoginTime(Email);
+                            return RedirectToAction("Dashbord", "SuperAdmin");
+                            break;
+
+                    default:
+                    
                     TempData["Error"] = "Invalid Email and Password";
                     return RedirectToAction("Login");
                 }
             }
             return View("login");
         }
-
-
 
 
 
@@ -420,7 +464,7 @@ namespace MARS_Project.Controllers
                         string Email = PortalEncryption.EncryptPassword(fp.EmailID.ToString());
                         string link = Url.Action("VerifyEmail", "User", new { token = token, EmailID = Email }, Request.Scheme);
 
-                        TempData["msg2"] = $@"Registration Successful! <br/>Verification link is valid for 24 hours.<br/> Click below to verify:<br/><br/><a href='{link}' class='btn btn-primary'>Verify Email</a>";
+                        TempData["msg2"] = $@"Forgot Password ! <br/>Verification link is valid for 24 hours.<br/> Click below to verify:<br/><br/><a href='{link}' class='btn btn-primary'>Verify Email</a>";
                         return RedirectToAction("VerifyLink");
 
                     }
@@ -490,7 +534,7 @@ namespace MARS_Project.Controllers
             // string email = secure.Decript(Encryptemail);
             string email = HttpContext.Session.GetString("EmailID");
 
-         
+
 
             if (email == null)
             {

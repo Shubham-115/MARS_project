@@ -1,0 +1,177 @@
+﻿@model MARS_Project.Models.Createfair
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@{
+    Layout = "_LayoutManageFair";
+}
+
+
+
+<h2 class="text-primary mb-3">Create Fair</h2>
+
+<div class="card shadow-sm p-3 mb-4">
+    <form asp-action="CreateFair" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+        <!-- Fair Name & Logo -->
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <label asp-for="FairName" class="form-label small fw-semibold"></label>
+                <input asp-for="FairName" class="form-control form-control-sm" placeholder="Enter Fair Name" />
+                <span asp-validation-for="FairName" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="FairLogoPath" class="form-label small fw-semibold">Upload Logo</label>
+                <input asp-for="FairLogoPath" type="file" class="form-control form-control-sm" accept="image/*" />
+                <span asp-validation-for="FairLogoPath" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <!-- Division / District / Tehsil -->
+        <div class="row mb-2">
+            <div class="col-md-4">
+                <label asp-for="Division" class="form-label small fw-semibold"></label>
+                <select asp-for="Division" class="form-select form-select-sm" id="divisionDropdown">
+                    <option value="">--Select Division--</option>
+                </select>
+                <span asp-validation-for="Division" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="District" class="form-label small fw-semibold"></label>
+                <select asp-for="District" class="form-select form-select-sm" id="districtDropdown">
+                    <option value="">--Select District--</option>
+                </select>
+                <span asp-validation-for="District" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Tehsil" class="form-label small fw-semibold"></label>
+                <select asp-for="Tehsil" class="form-select form-select-sm" id="tehsilDropdown">
+                    <option value="">--Select Tehsil--</option>
+                </select>
+                <span asp-validation-for="Tehsil" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <!-- City -->
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <label asp-for="City" class="form-label small fw-semibold"></label>
+                <input asp-for="City" class="form-control form-control-sm" placeholder="Enter City" />
+            </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label asp-for="StartDate" class="form-label small fw-semibold"></label>
+                <input asp-for="StartDate" type="date" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="EndDate" class="form-label small fw-semibold"></label>
+                <input asp-for="EndDate" type="date" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="ApplyStartDate" class="form-label small fw-semibold"></label>
+                <input asp-for="ApplyStartDate" type="date" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="ApplyEndDate" class="form-label small fw-semibold"></label>
+                <input asp-for="ApplyEndDate" type="date" class="form-control form-control-sm" />
+            </div>
+        </div>
+
+        <!-- Contacts -->
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <label asp-for="ContactMobile1" class="form-label small fw-semibold"></label>
+                <input asp-for="ContactMobile1" class="form-control form-control-sm" placeholder="Primary Mobile" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ContactMobile2" class="form-label small fw-semibold"></label>
+                <input asp-for="ContactMobile2" class="form-control form-control-sm" placeholder="Secondary Mobile (Optional)" />
+            </div>
+            <div class="col-md-12">
+                <label asp-for="ContactEmail" class="form-label small fw-semibold"></label>
+                <input asp-for="ContactEmail" class="form-control form-control-sm" placeholder="Contact Email" />
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-start mt-3">
+            <input type="submit" value="Create Fair" class="btn btn-success btn-sm me-2" />
+            <a asp-action="Index" class="btn btn-secondary btn-sm">Back</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        fetch('/json/mp-address.json')
+            .then(res => res.json())
+            .then(data => {
+                const divisionDD = document.getElementById("divisionDropdown");
+                const districtDD = document.getElementById("districtDropdown");
+                const tehsilDD = document.getElementById("tehsilDropdown");
+
+                let divisionsAdded = new Set();
+                data.forEach(d => {
+                    if (!divisionsAdded.has(d.division)) {
+                        let opt = document.createElement("option");
+                        opt.value = d.division;
+                        opt.text = d.division;
+                        divisionDD.add(opt);
+                        divisionsAdded.add(d.division);
+                    }
+                });
+
+                divisionDD.addEventListener("change", () => {
+                    districtDD.innerHTML = '<option value="">--Select District--</option>';
+                    tehsilDD.innerHTML = '<option value="">--Select Tehsil--</option>';
+
+                    let selectedDivision = data.filter(x => x.division === divisionDD.value);
+                    let districtsAdded = new Set();
+                    selectedDivision.forEach(div => {
+                        div.districts.forEach(d => {
+                            if (!districtsAdded.has(d.name)) {
+                                let opt = document.createElement("option");
+                                opt.value = d.name;
+                                opt.text = d.name;
+                                districtDD.add(opt);
+                                districtsAdded.add(d.name);
+                            }
+                        });
+                    });
+                });
+
+                districtDD.addEventListener("change", () => {
+                    tehsilDD.innerHTML = '<option value="">--Select Tehsil--</option>';
+                    let selectedDivision = data.filter(x => x.division === divisionDD.value);
+                    let selectedDistrictObj = null;
+                    for (let div of selectedDivision) {
+                        let dist = div.districts.find(d => d.name === districtDD.value);
+                        if (dist) { selectedDistrictObj = dist; break; }
+                    }
+                    if (selectedDistrictObj?.tehsils) {
+                        selectedDistrictObj.tehsils.forEach(t => {
+                            let opt = document.createElement("option");
+                            opt.value = t;
+                            opt.text = t;
+                            tehsilDD.add(opt);
+                        });
+                    }
+                });
+            });
+    </script>
+}

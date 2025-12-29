@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MARS_Project.Models.Account
+namespace MARS_Project.Models.Citizen
 {
     public class VerifiedEmailMobile
     {

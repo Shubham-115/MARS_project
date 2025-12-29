@@ -1,4 +1,4 @@
-﻿namespace MARS_Project.Models
+﻿namespace MARS_Project.Models.Citizen
 {
     public class ForgotPassword
     {

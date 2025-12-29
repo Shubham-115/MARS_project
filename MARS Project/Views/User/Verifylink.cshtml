@@ -5,9 +5,12 @@
 
 <h1>Verifylink</h1>
 
+
 @if (TempData["msg2"] != null)
 {
-    <div class="alert alert-success">
-        @Html.Raw(TempData["msg2"])
+    <div class="card border-success shadow-sm mb-3">
+        <div class="card-body text-center">
+            @Html.Raw(TempData["msg2"])
+        </div>
     </div>
 }
