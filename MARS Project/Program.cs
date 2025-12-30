@@ -1,5 +1,6 @@
 using MARS_Project.Connection;
 using MARS_Project.Repositories;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,10 @@ builder.Services.AddSession(options =>
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+var cultureInfo = new CultureInfo("en-GB");
+
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

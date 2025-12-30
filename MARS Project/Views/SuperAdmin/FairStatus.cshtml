@@ -1,0 +1,69 @@
+﻿@model MARS_Project.Models.SuperAdmin.SetFairStatus
+@{
+    Layout = "_LayoutSuperAdminDashbord";
+}
+
+@{
+    ViewData["Title"] = "FairStatus";
+}
+
+<h1>FairStatus</h1>
+@if (TempData["Update"] != null)
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        @TempData["Update"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<hr />
+<div class="row">
+        <div class="col-4 offset-4 border border-2 border-dark rounded">
+        <form asp-action="FairStatus" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="FairEmailId" class="control-label"></label>
+                <input asp-for="FairEmailId" id="EmailID" class="form-control" autocomplete="off" placeholder="Enter Fair Email" />
+                <span asp-validation-for="FairEmailId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="FairId" class="control-label"></label>
+                <input asp-for="FairId" type="text" class="form-control" autocomplete="off" placeholder="Enter Fair ID" />
+                <span asp-validation-for="FairId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <!-- Check Status button -->
+                <input type="submit"
+                       value="CheckStatus"
+                       name="ActionType"
+                       class="btn btn-primary mt-2 mb-2 w-100" />
+
+                <!-- Active / Deactivate button -->
+                <input type="submit"
+                       name="ActionType"
+                       value="@(Model?.Status == 1 ? "Deactivate" : "Active")"
+                       id="btnStatus"
+                       class="btn @(Model?.Status == 1 ? "btn-danger" : "btn-outline-primary") mt-2 mb-2 w-100"
+                       @(Model?.Status == null ? "disabled" : "")
+                       onclick="return confirmDeactivate(this);" />
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Dashbord">Back to Home</a>
+</div>
+<script>
+    function confirmDeactivate(button) {
+        // Only show confirmation if button value is "Deactivate"
+        if (button.value === "Deactivate") {
+            return confirm("Are you sure you want to deactivate this fair?");
+        }
+        return true; // Allow Active without confirmation
+    }
+</script>

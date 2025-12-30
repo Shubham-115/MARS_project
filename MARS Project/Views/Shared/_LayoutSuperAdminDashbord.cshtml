@@ -7,89 +7,113 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <!-- Optional: Bootstrap Icons -->
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MARS_SuperAdmin.styles.css" asp-append-version="true" />
 
     <style>
-        /* Custom Navbar Styling */
+        /* ===== NAVBAR COLORS ===== */
         .navbar {
-            background: linear-gradient(90deg, #4e73df, #1cc88a);
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
         }
 
-            .navbar .nav-link {
-                color: #fff !important;
-                font-weight: 500;
-                transition: color 0.3s;
+        /* Brand */
+        .navbar-brand {
+            font-weight: 700;
+            color: #ffffff !important;
+            letter-spacing: 0.5px;
+        }
+
+        /* Nav Links */
+        .navbar .nav-link {
+            color: #e0e6f1 !important;
+            font-weight: 500;
+            padding: 8px 14px;
+            transition: all 0.3s ease-in-out;
+        }
+
+            /* Hover (Mouse Over) */
+            .navbar .nav-link:hover {
+                color: #00f2fe !important;
+                background-color: rgba(255, 255, 255, 0.15);
+                border-radius: 6px;
+                transform: translateY(-2px);
             }
 
-                .navbar .nav-link:hover {
-                    color: #f8f9fa !important;
-                }
-
-        .navbar-brand {
-            font-weight: bold;
-            color: #fff !important;
+        /* Logout Special */
+        .logout-link {
+            color: #ffb703 !important;
+            font-weight: 600;
         }
 
-        /* Footer Styling */
-        footer {
-            background-color: #f8f9fa;
-            padding: 15px 0;
-        }
+            .logout-link:hover {
+                color: #ff4d4d !important;
+                background-color: rgba(255, 77, 77, 0.15);
+                transform: scale(1.1);
+            }
 
-        /* Container Padding */
-        .container main {
+        /* Main Content */
+        main {
             padding-top: 30px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #f1f4f9;
+            padding: 15px 0;
+            font-size: 14px;
         }
     </style>
 </head>
+
 <body>
+
+    <!-- HEADER -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-dark shadow">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="SuperAdmin" asp-action="Dashbord">
+
+                <a class="navbar-brand" asp-controller="SuperAdmin" asp-action="Dashbord">
                     <i class="bi bi-building"></i> MARS_SuperAdmin
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
+
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="SuperAdmin" asp-action="Dashbord">
+                            <a class="nav-link" asp-controller="SuperAdmin" asp-action="Dashbord">
                                 <i class="bi bi-house-door-fill"></i> Home
                             </a>
                         </li>
-                       
+
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="SuperAdmin" asp-action="CreateFair">
+                            <a class="nav-link" asp-controller="SuperAdmin" asp-action="CreateFair">
                                 <i class="bi bi-plus-circle-fill"></i> Create Fair
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="SuperAdmin" asp-action="UpdateFair">
+                            <a class="nav-link" asp-controller="SuperAdmin" asp-action="UpdateFair">
                                 <i class="bi bi-pencil-square"></i> Update Fair
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="SuperAdmin" asp-action="DeleteFair">
-                                <i class="bi bi-trash-fill"></i> Delete Fair
+                            <a class="nav-link" asp-controller="SuperAdmin" asp-action="FairStatus">
+                                <i class="bi bi-toggle-on"></i> Active / Deactive Fair
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link"
-                               asp-area="" asp-controller="SuperAdmin" asp-action="LogOut"
-                               style="color: #ffc107; transition: color 0.3s;"
-                               onmouseover="this.style.color='#dc3545';"
-                               onmouseout="this.style.color='#ffc107';">
+                            <a class="nav-link logout-link"
+                               asp-controller="SuperAdmin" asp-action="LogOut">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         </li>
-    
 
                     </ul>
                 </div>
@@ -97,22 +121,25 @@
         </nav>
     </header>
 
+    <!-- BODY -->
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
+    <!-- FOOTER -->
     <footer class="border-top text-muted text-center">
         <div class="container">
-            &copy; 2025 - MARS_SuperAdmin - <a asp-area="" asp-controller="Admin" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - MARS_SuperAdmin
         </div>
     </footer>
 
-    <!-- Scripts -->
+    <!-- SCRIPTS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

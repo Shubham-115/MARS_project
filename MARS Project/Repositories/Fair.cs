@@ -1,8 +1,11 @@
 ﻿using MARS_Project.Connection;
 using MARS_Project.Models;
+using MARS_Project.Models.SuperAdmin;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Collections.Generic;
+using System.Data;
 
 namespace MARS_Project.Repositories
 {
@@ -13,6 +16,34 @@ namespace MARS_Project.Repositories
         {
             _conn = conn;
 
+        }
+
+        public async Task<int> CheckFairStatus(SetFairStatus status)
+        {
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                string query = @"SELECT Status 
+                         FROM dbo.TradeFair 
+                         WHERE ContactEmail = @ContactEmail AND FairID = @FairID";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.Parameters.AddWithValue("@ContactEmail", status.FairEmailId);
+                    cmd.Parameters.AddWithValue("@FairID", status.FairId);
+
+                    await con.OpenAsync();
+                    var result = await cmd.ExecuteScalarAsync();
+
+                    if (result != null && result != DBNull.Value)
+                    {
+                        return Convert.ToInt32(result); // 0 or 1 from DB
+                    }
+
+                    // Return null if no record found
+                    return -1;
+                }
+            }
         }
 
 
@@ -43,7 +74,7 @@ namespace MARS_Project.Repositories
                     cmd.Parameters.AddWithValue("@ContactMobile2", model.ContactMobile2 ?? "");
                     cmd.Parameters.AddWithValue("@ContactEmail", model.ContactEmail ?? "");
                     cmd.Parameters.AddWithValue("@Status", model.Status);
-                    cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy ?? "Super Admin");
+                    cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy);
                     cmd.Parameters.AddWithValue("@CreatedAt", model.CreatedAt);
 
                     int rows = await cmd.ExecuteNonQueryAsync();
@@ -52,17 +83,36 @@ namespace MARS_Project.Repositories
             }
         }
 
+       
 
-
-        public Task<string> DeleteFair()
+        public async Task<int> SetFairStatus(SetFairStatus status)
         {
-            throw new NotImplementedException();
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                string updatestatus = @"UPDATE TradeFair SET Status = @Status  WHERE ContactEmail = @ContactEmail  AND FairID = @FairID";
+
+                using (SqlCommand cmd = new SqlCommand(updatestatus, con))
+                {
+                    cmd.CommandType = CommandType.Text;
+
+                    cmd.Parameters.AddWithValue("@Status", status.Status);
+                    cmd.Parameters.AddWithValue("@ContactEmail", status.FairEmailId);
+                    cmd.Parameters.AddWithValue("@FairID", status.FairId);
+
+                    await con.OpenAsync();
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                    return rowsAffected; // returns number of rows updated
+                }
+            }
         }
+
+
+
 
         public Task<string> UpdateFair()
         {
             throw new NotImplementedException();
-        }
+        }       
     }
 }
 
