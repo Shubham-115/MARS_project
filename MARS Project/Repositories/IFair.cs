@@ -1,4 +1,5 @@
 ﻿using MARS_Project.Models;
+using MARS_Project.Models.Citizen;
 using MARS_Project.Models.SuperAdmin;
 
 namespace MARS_Project.Repositories
@@ -9,6 +10,7 @@ namespace MARS_Project.Repositories
         public Task<string> UpdateFair();
         public Task<int> SetFairStatus(SetFairStatus status);
         public Task<int> CheckFairStatus(SetFairStatus status);
+        public  Task<int> AddFairAdmin(SignUp signup);
 
 
     }

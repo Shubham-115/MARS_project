@@ -6,6 +6,7 @@ using MARS_Project.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using NuGet.Protocol;
 using PortalLib.Framework.Utilities;
 using System.Threading.Tasks;
 using ForgotPassword = MARS_Project.Models.Citizen.ForgotPassword;
@@ -38,6 +39,10 @@ namespace MARS_Project.Controllers
         [HttpGet]
         public IActionResult SignUp()
         {
+            if (HttpContext.Session.GetString("EmailID") != null)
+            {
+                return RedirectToAction("Dashbord");
+            }
             return View();
         }
 
@@ -357,6 +362,15 @@ namespace MARS_Project.Controllers
         [AllowAnonymous]
         public IActionResult Login()
         {
+            Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
+            // Session check (ASP.NET Core way)
+            if (HttpContext.Session.GetString("EmailID") != null)
+            {
+                return RedirectToAction("Index");
+            }
 
             return View();
         }
@@ -400,25 +414,33 @@ namespace MARS_Project.Controllers
                 // convert the plain password string to HashPassword string
 
                 int loginUser = await users.UserLogin(login);
-               
-                    switch (loginUser)
-                    {
-                        case 1:
 
-                            HttpContext.Session.SetString("EmailID", Email);
-                            users.UpdateLoginTime(Email);
-                            return RedirectToAction("Dashbord", "User");
-                            break;
-                        case 2:
-                            HttpContext.Session.SetString("EmailID", Email);
-                            users.UpdateLoginTime(Email);
-                            return RedirectToAction("Dashbord", "SuperAdmin");
-                            break;
+                switch (loginUser)
+                {
+                    case 1:
+
+                        HttpContext.Session.SetString("EmailID", Email);
+                        HttpContext.Session.SetString("Role", "User");
+                        users.UpdateLoginTime(Email);
+                        return RedirectToAction("Dashbord", "User");
+                        break;
+                    case 2:
+                        HttpContext.Session.SetString("EmailID", Email);
+                        HttpContext.Session.SetString("Role", "SuperAdmin");
+                        users.UpdateLoginTime(Email);
+                        return RedirectToAction("Dashbord", "SuperAdmin");
+                        break;
+                    case 3:
+                        HttpContext.Session.SetString("EmailID", Email);
+                        HttpContext.Session.SetString("Role", "FairAdmin");
+                        users.UpdateLoginTime(Email);
+                        return RedirectToAction("Dashbord", "FairAdmin");
+                        break;
 
                     default:
-                    
-                    TempData["Error"] = "Invalid Email and Password";
-                    return RedirectToAction("Login");
+
+                        TempData["Error"] = "Invalid Email and Password";
+                        return RedirectToAction("Login");
                 }
             }
             return View("login");
@@ -510,12 +532,11 @@ namespace MARS_Project.Controllers
                     return View();
                 }
 
-
-
                 string result = users.PassWordChange(EmailID, passChange.PasswordHash);
                 TempData["SuccessChange"] = result;
                 users.setStatus(EmailID, 1);
-                return RedirectToAction("Dashbord");
+                HttpContext.Session.Clear();
+                return RedirectToAction("Login");
             }
 
             return View();
@@ -533,6 +554,7 @@ namespace MARS_Project.Controllers
             // string Encryptemail = HttpContext.Session.GetString("EmailID");
             // string email = secure.Decript(Encryptemail);
             string email = HttpContext.Session.GetString("EmailID");
+           
 
 
 

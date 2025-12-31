@@ -1,12 +1,16 @@
 ﻿using MARS_Project.CreateFilters;
+using MARS_Project.Filters;
 using MARS_Project.Models;
+using MARS_Project.Models.Citizen;
 using MARS_Project.Models.SuperAdmin;
 using MARS_Project.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace MARS_Project.Controllers
 {
+    [RoleAuthorize("SuperAdmin")]
     public class SuperAdminController : Controller
 
     {
@@ -22,7 +26,12 @@ namespace MARS_Project.Controllers
         [SessionAuthorize]
         public IActionResult Dashbord()
         {
+
             string email = HttpContext.Session.GetString("EmailID");
+            //if (email != null)
+            //{
+            //    return RedirectToAction("Dashbord", "SuperAdmin");
+            //}
 
             if (HttpContext == null)
                 return RedirectToAction("Login", "User");
@@ -201,6 +210,28 @@ namespace MARS_Project.Controllers
             }
 
             // Default return to avoid null model
+            return View();
+        }
+
+
+        public IActionResult FairAdmin()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> FairAdmin(SignUp signUp)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            int result = await fair.AddFairAdmin(signUp);
+            if(result != 0)
+            {
+                TempData["Success"] = "Fair Admin Inserted Successfully........!";
+                return RedirectToAction("Dashbord");
+            }
+
             return View();
         }
 

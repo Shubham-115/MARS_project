@@ -1,5 +1,6 @@
 ﻿using MARS_Project.Connection;
 using MARS_Project.Models;
+using MARS_Project.Models.Citizen;
 using MARS_Project.Models.SuperAdmin;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
@@ -112,7 +113,88 @@ namespace MARS_Project.Repositories
         public Task<string> UpdateFair()
         {
             throw new NotImplementedException();
-        }       
+        }
+
+
+
+        public async Task<int> AddFairAdmin(SignUp signup)
+        {           
+
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                await con.OpenAsync();
+
+                using (SqlTransaction transaction = con.BeginTransaction())
+                {
+                    try
+                    {
+                        // 1️⃣ Insert User
+                        string userQuery = @"
+                    INSERT INTO dbo.Users
+                    (MobileNo, EmailID, EmailVerified, MobileVerified, FirstName, LastName, Status, CreatedBy)
+                    VALUES
+                    (@MobileNo, @EmailID, 0, 0, @FirstName, @LastName, 0, @CreatedBy);
+                    SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+                        using SqlCommand userCmd = new SqlCommand(userQuery, con, transaction);
+                        userCmd.Parameters.Add("@MobileNo", SqlDbType.VarChar).Value = signup.MobileNo;
+                        userCmd.Parameters.Add("@EmailID", SqlDbType.VarChar).Value = signup.EmailID;
+                        userCmd.Parameters.Add("@FirstName", SqlDbType.VarChar).Value = signup.FirstName;
+                        userCmd.Parameters.Add("@LastName", SqlDbType.VarChar).Value = signup.LastName;
+                        userCmd.Parameters.Add("@CreatedBy", SqlDbType.VarChar).Value = signup.FirstName;
+
+                        int userId = Convert.ToInt32(await userCmd.ExecuteScalarAsync());
+
+                        // 2️⃣ Get or Create Role
+                        string roleName = "FairAdmin";
+
+                        string roleQuery = "SELECT RoleID FROM dbo.UserRoles WHERE RoleName = @RoleName";
+                        using SqlCommand roleCmd = new SqlCommand(roleQuery, con, transaction);
+                        roleCmd.Parameters.Add("@RoleName", SqlDbType.VarChar).Value = roleName;
+
+                        object roleResult = await roleCmd.ExecuteScalarAsync();
+                        int roleId;
+
+                        if (roleResult == null)
+                        {
+                            string insertRoleQuery = @"
+                        INSERT INTO dbo.UserRoles (RoleName)
+                        VALUES (@RoleName);
+                        SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+                            using SqlCommand insertRoleCmd = new SqlCommand(insertRoleQuery, con, transaction);
+                            insertRoleCmd.Parameters.Add("@RoleName", SqlDbType.VarChar).Value = roleName;
+
+                            roleId = Convert.ToInt32(await insertRoleCmd.ExecuteScalarAsync());
+                        }
+                        else
+                        {
+                            roleId = Convert.ToInt32(roleResult);
+                        }
+
+                        // 3️⃣ Map User to Role
+                        string mapQuery = @"
+                    INSERT INTO dbo.UserRoleMapping (UserID, RoleID, AssignedAt)
+                    VALUES (@UserID, @RoleID, @AssignedAt)";
+
+                        using SqlCommand mapCmd = new SqlCommand(mapQuery, con, transaction);
+                        mapCmd.Parameters.Add("@UserID", SqlDbType.Int).Value = userId;
+                        mapCmd.Parameters.Add("@RoleID", SqlDbType.Int).Value = roleId;
+                        mapCmd.Parameters.Add("@AssignedAt", SqlDbType.DateTime).Value = DateTime.UtcNow;
+
+                        await mapCmd.ExecuteNonQueryAsync();
+
+                        transaction.Commit();
+                        return 1;
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        return 0;
+                    }
+                }
+            }
+        }
     }
 }
 
