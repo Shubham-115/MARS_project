@@ -1,7 +1,9 @@
 ﻿using MARS_Project.CreateFilters;
 using MARS_Project.Filters;
+using MARS_Project.Models.FairAdmin;
 using MARS_Project.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace MARS_Project.Controllers
 {
@@ -12,10 +14,12 @@ namespace MARS_Project.Controllers
     {
         private readonly IUsers users;
         private readonly IFair fair;
-        public FairAdminController(IUsers user, IFair Fair)
+        private readonly IAddFair addFair;
+        public FairAdminController(IUsers user, IFair Fair,IAddFair addfair)
         {
             users = user;
             fair = Fair;
+            addFair = addfair;
         }
         [SessionAuthorize]
         public IActionResult Dashbord()
@@ -59,5 +63,34 @@ namespace MARS_Project.Controllers
             return RedirectToAction("Login", "User");
 
         }
+
+        public async Task<IActionResult> CreateSector(long FairID)
+        {
+            string email = HttpContext.Session.GetString("EmailID");
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("login", "User");
+            }
+            long fairId = await addFair.GetFairID(email);
+            if (fairId == 0)
+            {
+                TempData["Invalid"] ="User not Exist";
+                HttpContext.Session.Clear();
+                return RedirectToAction("login","User");
+            }
+            return View(fairId);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateSector(Sector sector)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(sector);
+            }
+
+            return View();
+        }
+
     }
 }

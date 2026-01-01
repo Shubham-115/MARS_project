@@ -20,11 +20,7 @@ namespace MARS_Project.Repositories
             _conn = conn;
 
         }
-
-
-
-
-
+       
         public async Task<int> UserSingUp(SignUp signup)
         {
             if (IsexistEmail(signup.EmailID))

@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUsers, Users>();
-builder.Services.AddScoped<IFair, Fair>();
+builder.Services.AddScoped<IFair, SuperAdmin>();
 
 builder.Services.AddScoped<StringConnection>();
 builder.Services.AddSession(options =>

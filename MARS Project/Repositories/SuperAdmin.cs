@@ -10,10 +10,10 @@ using System.Data;
 
 namespace MARS_Project.Repositories
 {
-    public class Fair : IFair
+    public class SuperAdmin : IFair
     {
         private readonly StringConnection _conn;
-        public Fair(StringConnection conn)
+        public SuperAdmin(StringConnection conn)
         {
             _conn = conn;
 

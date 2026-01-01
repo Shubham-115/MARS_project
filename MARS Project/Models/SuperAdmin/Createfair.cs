@@ -13,7 +13,7 @@ namespace MARS_Project.Models
         public string FairName { get; set; }
 
         [NotMapped]
-        
+
         public IFormFile FairLogoPath { get; set; } // Uploaded file
 
         public string FairLogoPathString { get; set; } // Path saved in DB
@@ -23,7 +23,7 @@ namespace MARS_Project.Models
         public string District { get; set; }
         [Required]
         public string Tehsil { get; set; }
-        [Required(ErrorMessage ="Please Enter city or Place Name")]
+        [Required(ErrorMessage = "Please Enter city or Place Name")]
         public string City { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd/MM/yy}", ApplyFormatInEditMode = true)]
         [DataType(DataType.Date)]
@@ -34,8 +34,8 @@ namespace MARS_Project.Models
         [DisplayFormat(DataFormatString = "{0:dd/MM/yy}", ApplyFormatInEditMode = true)]
         [DataType(DataType.Date)]
         public DateTime? ApplyStartDate { get; set; }
-       [DisplayFormat(DataFormatString = "{0:dd/MM/yy}", ApplyFormatInEditMode = true)]
-[DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yy}", ApplyFormatInEditMode = true)]
+        [DataType(DataType.Date)]
         public DateTime? ApplyEndDate { get; set; }
         [Required]
         public string ContactMobile1 { get; set; }
