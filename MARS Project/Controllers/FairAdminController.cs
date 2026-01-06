@@ -3,6 +3,7 @@ using MARS_Project.Filters;
 using MARS_Project.Models.FairAdmin;
 using MARS_Project.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Threading.Tasks;
 
 namespace MARS_Project.Controllers
@@ -28,9 +29,9 @@ namespace MARS_Project.Controllers
             string email = HttpContext.Session.GetString("EmailID");
             //if (email != null)
             //{
-            //    return RedirectToAction("Dashbord", "SuperAdmin");
+            //    return RedirectToAction("Dashbord");
             //}
-
+           
             if (HttpContext == null)
                 return RedirectToAction("Login", "User");
 
@@ -64,21 +65,15 @@ namespace MARS_Project.Controllers
 
         }
 
-        public async Task<IActionResult> CreateSector(long FairID)
+        public async Task<IActionResult> CreateSector()
         {
             string email = HttpContext.Session.GetString("EmailID");
             if (string.IsNullOrEmpty(email))
             {
                 return RedirectToAction("login", "User");
-            }
-            long fairId = await addFair.GetFairID(email);
-            if (fairId == 0)
-            {
-                TempData["Invalid"] ="User not Exist";
-                HttpContext.Session.Clear();
-                return RedirectToAction("login","User");
-            }
-            return View(fairId);
+            }          
+
+            return View();
         }
 
         [HttpPost]
@@ -88,9 +83,51 @@ namespace MARS_Project.Controllers
             {
                 return View(sector);
             }
+            long fairId = await addFair.GetFairID(sector.EmailID);
+            if (sector.FairID != fairId)
+            {
+                TempData["Invalid"] = "Fair not Exist";
+                
+                return View(sector);
+            }
+            int sectorID = await addFair.AddSector(sector);
+            if (sectorID != 0)
+            {
+                TempData["Sector"] = "Sector inserted SuccessFully ......!";
+                return RedirectToAction("CreateSector");
+            }
 
-            return View();
+            TempData["Sector"] = "Sector already Exist ......!";
+            return View(sector);
+            
         }
+        [HttpPost]
+        public async Task<IActionResult> ForgotFairID(string EmailID)
+        {
+            // 1. Email validation
+            if (string.IsNullOrEmpty(EmailID))
+            {
+                TempData["Invalid"] = "Please enter Email ID";
+                return RedirectToAction("CreateSector");
+            }
+
+            // 2. Get FairID from DB
+            long fairId = await addFair.GetFairID(EmailID);
+
+            // 3. Check if Fair exists
+            if (fairId <= 0)
+            {
+                TempData["Invalid"] = "Fair does not exist";
+                return RedirectToAction("CreateSector");
+            }
+
+            // 4. Success
+            TempData["Sector"] = $"Your Fair ID is {fairId}";
+            TempData["FairID"] = fairId;
+
+            return RedirectToAction("CreateSector");
+        }
+
 
     }
 }

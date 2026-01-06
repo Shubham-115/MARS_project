@@ -32,8 +32,26 @@ namespace MARS_Project.Controllers
         }
         public IActionResult Index()
         {
+            // Check if session exists
+            var email = HttpContext.Session.GetString("EmailID");
+            var role = HttpContext.Session.GetString("Role");
+
+            if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(role))
+            {
+                // Role-based redirect
+                return role switch
+                {
+                    "SuperAdmin" => RedirectToAction("Dashbord", "SuperAdmin"),
+                    "FairAdmin" => RedirectToAction("Dashbord", "FairAdmin"),
+                    "User" => RedirectToAction("Dashbord", "User"),
+                    _ => RedirectToAction("Index", "Home") // default fallback
+                };
+            }
+
+            // No session → show Index / Login page
             return View();
         }
+
 
         // Get singUp Action Method
         [HttpGet]

@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUsers, Users>();
 builder.Services.AddScoped<IFair, SuperAdmin>();
+builder.Services.AddScoped<IAddFair, AddFair>();
+
 
 builder.Services.AddScoped<StringConnection>();
 builder.Services.AddSession(options =>

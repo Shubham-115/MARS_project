@@ -18,9 +18,25 @@ namespace MARS_Project.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<int> AddSector(Sector sector)
+        public async Task<int> AddSector(Sector sector)
         {
-            throw new NotImplementedException();
+           using(SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                await con.OpenAsync();
+                SqlCommand cmd = new SqlCommand("ADDSECTOR",con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@FairID",sector.FairID);
+                cmd.Parameters.AddWithValue("@SectorName", sector.SectorName);
+                cmd.Parameters.AddWithValue("@SectorGroup", sector.SectorGroup);
+                cmd.Parameters.AddWithValue("@Area", sector.Area);
+                cmd.Parameters.AddWithValue("@Description", sector.Description);
+                cmd.Parameters.AddWithValue("@IsActive", sector.IsActive);
+                object result = await cmd.ExecuteScalarAsync();
+                if (result == null)
+                    return 0; // user not found
+
+                return Convert.ToInt32(result);
+            }
         }
 
         public Task<string> AddSubSector(Subsector subsector)
@@ -31,11 +47,15 @@ namespace MARS_Project.Repositories
         {
             using (SqlConnection con = new SqlConnection(_conn.Dbcs))
             {
+                await con.OpenAsync();
                 SqlCommand cmd = new SqlCommand("GetFairByEmail",con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@EmailID", EmailID);
-               long fairID =  await cmd.ExecuteNonQueryAsync();
-                return fairID;
+               object result  = await cmd.ExecuteScalarAsync();
+                if (result == null)
+                    return 0; // user not found
+
+                return Convert.ToInt32(result);
 
             }
         }

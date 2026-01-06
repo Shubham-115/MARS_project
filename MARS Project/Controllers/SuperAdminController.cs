@@ -235,6 +235,12 @@ namespace MARS_Project.Controllers
             return View();
         }
 
+        public async Task<IActionResult> UpdateFairAdmin()
+        {
+
+            return View();
+        }
+
 
 
     }
