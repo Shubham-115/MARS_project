@@ -4,6 +4,7 @@ using MARS_Project.Models;
 using MARS_Project.Models.Citizen;
 using MARS_Project.Models.SuperAdmin;
 using MARS_Project.Repositories;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
@@ -17,10 +18,13 @@ namespace MARS_Project.Controllers
 
         private readonly IUsers users;
         private readonly IFair fair;
-        public SuperAdminController(IUsers user, IFair Fair)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public SuperAdminController(IUsers user, IFair Fair, IWebHostEnvironment webHostEnvironment)
         {
             users = user;
             fair = Fair;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [SessionAuthorize]
@@ -101,7 +105,7 @@ namespace MARS_Project.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
+
         public async Task<IActionResult> CreateFair(Createfair model)
         {
             ModelState.Remove("FairLogoPathString");
@@ -111,7 +115,7 @@ namespace MARS_Project.Controllers
             {
                 ModelState.AddModelError("FairLogoPath", "Logo is required");
             }
-            
+
             if (!ModelState.IsValid)
             {
                 return View(model); // ⚠️ MUST pass model
@@ -178,15 +182,15 @@ namespace MARS_Project.Controllers
                     return View(status);
 
                 int result = await fair.CheckFairStatus(status);
-                if (result <0)
+                if (result < 0)
                 {
                     TempData["Update"] = "Invlaid Crediantails !";
                     return RedirectToAction("FairStatus");
                 }
-              
+
                 status.Status = result;
 
-                return View(status); 
+                return View(status);
             }
 
             if (ActionType == "Active" || ActionType == "Deactivate")
@@ -194,7 +198,7 @@ namespace MARS_Project.Controllers
                 if (!ModelState.IsValid)
                     return View(status); // return model to avoid NullReference
 
-                if ((status.FairId)<0)
+                if ((status.FairId) < 0)
                 {
                     TempData["Update"] = "Fair ID is required!";
                     return View(status);
@@ -226,7 +230,7 @@ namespace MARS_Project.Controllers
                 return View();
             }
             int result = await fair.AddFairAdmin(signUp);
-            if(result != 0)
+            if (result != 0)
             {
                 TempData["Success"] = "Fair Admin Inserted Successfully........!";
                 return RedirectToAction("Dashbord");
@@ -234,14 +238,82 @@ namespace MARS_Project.Controllers
 
             return View();
         }
+      
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<IActionResult> UpdateFairSearch(int FairID, string EmailID)
+        {
+            if (FairID <= 0 || string.IsNullOrEmpty(EmailID))
+            {
+                TempData["Message"] = "Please provide valid Fair ID and Email ID.";
+                return View("UpdateFair", new Createfair());
+            }
+
+            var fairDetails = await fair.GetFairDetails(FairID, EmailID);
+
+            if (fairDetails == null || fairDetails.Count == 0)
+            {
+                TempData["Message"] = "No fair found with this ID and Email.";
+                return View("UpdateFair", new Createfair());
+            }
+
+            return View("UpdateFair", fairDetails.First());
+        }
+
+        public async Task<IActionResult> UpdateFair()
+        {
+            return View();
+        }
+        // POST: update fair
+
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateFair(Createfair model)
+        {
+            ModelState.Remove("FairLogoPathString");
+            ModelState.Remove("FairLogoPath");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // 🔹 If new logo uploaded → replace
+            if (model.FairLogoPath != null && model.FairLogoPath.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads/fairlogos");
+
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                string fileName = Guid.NewGuid() + Path.GetExtension(model.FairLogoPath.FileName);
+                string filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.FairLogoPath.CopyToAsync(stream);
+                }
+
+                model.FairLogoPathString = "/uploads/fairlogos/" + fileName;
+            }
+            // ❗ ELSE DO NOTHING
+            // Hidden field already contains old FairLogoPathString
+
+            bool result = await fair.UpdateFair(model);
+
+            TempData["Message"] = result
+                ? "Fair updated successfully!"
+                : "Something went wrong.";
+
+            return RedirectToAction("UpdateFair");
+        }
 
         public async Task<IActionResult> UpdateFairAdmin()
         {
-
             return View();
         }
-
-
-
+        [HttpPost]
+        public async Task<IActionResult> UpdateFairAdmin(SignUp signUp)
+        {
+            return View();
+        }
     }
 }

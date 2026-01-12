@@ -7,7 +7,8 @@ namespace MARS_Project.Models.Citizen
 
         [Required]
         [MinLength(6)]
-        [RegularExpression("^((?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0 - 9])|(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[^a-zA-Z0-9])|(?=.*?[A-Z])(?=.*?[0 - 9])(?=.*?[^a-zA-Z0-9])|(?=.*?[a-z])(?=.*?[0 - 9])(?=.*?[^a-zA-Z0-9])).{6,}$")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9\W]).{6,}$",
+            ErrorMessage = "Password must be at least 6 characters and include uppercase, lowercase, and number/special character.")]
         public string PasswordHash { get; set; }
         [Required]
         public string ConfirmPassword { get; set; }

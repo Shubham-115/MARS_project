@@ -7,11 +7,11 @@ namespace MARS_Project.Repositories
     public interface IFair
     {
         public Task<string>CreateFair(Createfair createFair);
-        public Task<string> UpdateFair();
+        public Task<bool> UpdateFair(Createfair createfair);
         public Task<int> SetFairStatus(SetFairStatus status);
         public Task<int> CheckFairStatus(SetFairStatus status);
         public  Task<int> AddFairAdmin(SignUp signup);
 
-
+        public Task<List<Createfair>> GetFairDetails(int FairID, string EmailID);
     }
 }

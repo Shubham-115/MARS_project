@@ -1,5 +1,7 @@
 ﻿using MARS_Project.CreateFilters;
 using MARS_Project.Filters;
+using MARS_Project.Models;
+using MARS_Project.Models.Citizen;
 using MARS_Project.Models.FairAdmin;
 using MARS_Project.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -127,6 +129,68 @@ namespace MARS_Project.Controllers
 
             return RedirectToAction("CreateSector");
         }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> AddSubSector()
+        {
+            return View();
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> AddSubSector(Subsector subsector)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(subsector);
+            }
+           string message = await addFair.AddSubSector(subsector);
+            TempData["insertResult"] = message;
+            return RedirectToAction("AddSubSector");
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> AddBlock()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult>AddBlock(Block block)
+        {
+            if(!ModelState.IsValid)
+            return View(block);
+
+            string result = await addFair.AddBlock(block);
+
+            TempData["insertResult"] = result;
+            return RedirectToAction("AddBlock");
+        }
+
+
+        public async Task<IActionResult> profile(Myprofile profile)
+        {
+            string EmailID = HttpContext.Session.GetString("EmailID");
+            if (string.IsNullOrEmpty(EmailID))
+            {
+                return RedirectToAction("Login", "Users");
+            }
+
+            profile.Email = EmailID;
+            profile = await addFair.profile(profile);
+            if (profile != null)
+            {
+                return View(profile);
+            }
+            return View();
+        }
+
+
 
 
     }

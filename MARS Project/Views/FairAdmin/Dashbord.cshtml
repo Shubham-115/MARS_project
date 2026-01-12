@@ -1,4 +1,5 @@
-﻿<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+﻿@using MARS_Project.Models.Citizen
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @{
     Layout = "_LayoutFairAdminDashbord";
 }
@@ -22,3 +23,26 @@
         });
     </script>
 }
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+
+            <div class="card text-center shadow" style="height:350px;">
+                <div class="card-header bg-primary text-white">
+                    <h4>My Profile</h4>
+                </div>
+
+                <div class="card-body">
+                    <p><strong>Name:</strong> @Model.FName @Model.LName</p>
+                    <p><strong>Email:</strong> @Model.Email</p>
+                    <p><strong>Mobile:</strong> @Model.MobileNo</p>
+                    <p><strong>Role:</strong> @Model.role</p>
+                    <p><strong>Created:</strong> @Model.createdAt.ToString("dd-MM-yyyy")</p>
+                </div>               
+            </div>
+
+        </div>
+    </div>
+</div>
+

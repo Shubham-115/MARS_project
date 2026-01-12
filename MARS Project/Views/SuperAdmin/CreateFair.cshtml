@@ -28,20 +28,23 @@
 
         <!-- Fair Name & Logo -->
         <div class="row mb-2">
-            <div class="col-md-6">
-                <label asp-for="FairName" class="form-label small fw-semibold"></label>
-                <input asp-for="FairName" class="form-control form-control-sm" placeholder="Enter Fair Name" />
-                <span asp-validation-for="FairName" class="text-danger small"></span>
-            </div>
-            <div class="col-md-6">
-                <label asp-for="FairLogoPath" class="form-label small fw-semibold">Upload Logo</label>
-                <input asp-for="FairLogoPath" type="file" class="form-control form-control-sm" accept="image/*" />
-                <span asp-validation-for="FairLogoPath" class="text-danger small"></span>
-            </div>
-        </div>
 
+            <h6>Fasic Details</h6>
+                <div class="col-md-6">
+                    <label asp-for="FairName" class="form-label small fw-semibold"></label>
+                    <input asp-for="FairName" class="form-control form-control-sm" placeholder="Enter Fair Name" />
+                    <span asp-validation-for="FairName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="FairLogoPath" class="form-label small fw-semibold">Upload Logo</label>
+                    <input asp-for="FairLogoPath" type="file" class="form-control form-control-sm" accept="image/*" />
+                    <span asp-validation-for="FairLogoPath" class="text-danger small"></span>
+                </div>
+            </div>
+      
         <!-- Division / District / Tehsil -->
         <div class="row mb-2">
+            <h6>Address Details</h6>
             <div class="col-md-4">
                 <label asp-for="Division" class="form-label small fw-semibold"></label>
                 <select asp-for="Division" class="form-select form-select-sm" id="divisionDropdown">
@@ -64,9 +67,10 @@
                 <span asp-validation-for="Tehsil" class="text-danger small"></span>
             </div>
         </div>
-
+       
         <!-- City -->
         <div class="row mb-2">
+           
             <div class="col-md-6">
                 <label asp-for="City" class="form-label small fw-semibold"></label>
                 <input asp-for="City" class="form-control form-control-sm" placeholder="Enter City" />
@@ -80,6 +84,7 @@
         </div>
 
         <!-- Dates -->
+        <h6>Fair & Apply Date</h6>
         <div class="row mb-2">
             <div class="col-md-3">
                 <label asp-for="StartDate" class="form-label small fw-semibold"></label>
@@ -109,6 +114,7 @@
 
         <!-- Contacts -->
         <div class="row mb-2">
+            <h6>Contact Details</h6>
             <div class="col-md-6">
                 <label asp-for="ContactMobile1" class="form-label small fw-semibold"></label>
                 <input asp-for="ContactMobile1" class="form-control form-control-sm" placeholder="Primary Mobile" />
@@ -188,4 +194,9 @@
                 });
             });
     </script>
+}
+
+
+@{
+    Layout = "_LayoutSuperAdminDashbord";
 }

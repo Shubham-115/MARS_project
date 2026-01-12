@@ -2,6 +2,9 @@
 {
     public class Users
     {
+        public Users() { } // parameterless constructor
+
+     
 
         public long UserId { get; set; }
         public string MobileNo { get; set; }

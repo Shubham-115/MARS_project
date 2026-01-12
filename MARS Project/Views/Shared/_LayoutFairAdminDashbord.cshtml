@@ -94,7 +94,15 @@
                                         <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="DeleteSector">Delete</a></li>
                                     </ul>
                                 </li>
-
+                                <!-- SubSector -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">SubSector</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="AddSubSector">Add</a></li>
+                                        <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="UpdateSubSector">Update</a></li>
+                                        <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="DeleteSubSector">Delete</a></li>
+                                    </ul>
+                                </li>
                                 <!-- Block -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">Block</a>
@@ -105,29 +113,15 @@
                                     </ul>
                                 </li>
 
-                                <!-- SubSector -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">SubSector</a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="AddSubSector">Add</a></li>
-                                        <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="UpdateSubSector">Update</a></li>
-                                        <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="DeleteSubSector">Delete</a></li>
-                                    </ul>
-                                </li>
+                               
 
                             </ul>
                         </li>
 
-                        <!-- Update Fair -->
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="FairAdmin" asp-action="UpdateFair">
-                                <i class="bi bi-pencil-square"></i> Update Fair
-                            </a>
-                        </li>
-
+                     
                         <!-- Fair Admin -->
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="FairAdmin" asp-action="FairAdmin">
+                            <a class="nav-link" asp-controller="FairAdmin" asp-action="profile">
                                 <i class="bi bi-people"></i> FairAdmin
                             </a>
                         </li>

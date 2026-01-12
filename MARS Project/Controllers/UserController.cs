@@ -1,6 +1,7 @@
 ﻿using MARS_Project.Connection;
 using MARS_Project.CreateFilters;
 using MARS_Project.DataSecurity;
+using MARS_Project.Filters;
 using MARS_Project.Models.Citizen;
 using MARS_Project.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -255,7 +256,7 @@ namespace MARS_Project.Controllers
             {
                 EmailID = PortalEncryption.DecryptPassword(EmailID.ToString());
 
-                if (users.resetToken(EmailID))
+                if (string.IsNullOrEmpty( users.UpdateToken(EmailID)))
                 {
                     // token = PortalEncryption.EncryptPassword(token);
                     EmailID = PortalEncryption.EncryptPassword(EmailID.ToString());
@@ -439,19 +440,19 @@ namespace MARS_Project.Controllers
 
                         HttpContext.Session.SetString("EmailID", Email);
                         HttpContext.Session.SetString("Role", "User");
-                        users.UpdateLoginTime(Email);
+                      
                         return RedirectToAction("Dashbord", "User");
                         break;
                     case 2:
                         HttpContext.Session.SetString("EmailID", Email);
                         HttpContext.Session.SetString("Role", "SuperAdmin");
-                        users.UpdateLoginTime(Email);
+                    
                         return RedirectToAction("Dashbord", "SuperAdmin");
                         break;
                     case 3:
                         HttpContext.Session.SetString("EmailID", Email);
                         HttpContext.Session.SetString("Role", "FairAdmin");
-                        users.UpdateLoginTime(Email);
+                      
                         return RedirectToAction("Dashbord", "FairAdmin");
                         break;
 
@@ -567,6 +568,7 @@ namespace MARS_Project.Controllers
 
 
         [SessionAuthorize]
+        [RoleAuthorize("User")]
         public IActionResult Dashbord()
         {
             // string Encryptemail = HttpContext.Session.GetString("EmailID");

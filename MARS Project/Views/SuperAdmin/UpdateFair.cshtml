@@ -1,0 +1,209 @@
+﻿@model Createfair
+
+@{
+    ViewData["Title"] = "Update Fair";
+}
+
+<div class="container mt-5">
+
+    <h2 class="text-center text-primary mb-4 animate__animated animate__fadeInDown">@ViewData["Title"]</h2>
+
+    @* TempData alert for messages *@
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show animate__animated animate__fadeIn" role="alert">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Search form if Model is empty *@
+    @if (Model == null || Model.Id == 0)
+    {
+        <div class="card mx-auto shadow-lg animate__animated animate__fadeInUp" style="max-width: 450px;">
+            <div class="card-body">
+                <form asp-action="UpdateFairSearch" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Fair ID</label>
+                        <input name="FairID" type="number" class="form-control" placeholder="Enter Fair ID" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contact Email</label>
+                        <input name="EmailID" type="email" class="form-control" placeholder="Enter Contact Email" required />
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg btn-hover">Fetch Fair</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+    else
+    {
+        @* Update form with validation *@
+        <div class="card mx-auto shadow-lg animate__animated animate__fadeInUp" style="max-width: 650px;">
+            <div class="card-body">
+                <form id="updateFairForm" asp-action="UpdateFair" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Id" />
+                    @* Keep the old logo path in hidden field *@
+                    <input type="hidden" asp-for="FairLogoPathString" />
+
+                    <div class="mb-3">
+                        <label asp-for="FairName" class="form-label"></label>
+                        <input asp-for="FairName" class="form-control" />
+                        <span asp-validation-for="FairName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Division" class="form-label"></label>
+                        <input asp-for="Division" class="form-control" />
+                        <span asp-validation-for="Division" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="District" class="form-label"></label>
+                        <input asp-for="District" class="form-control" />
+                        <span asp-validation-for="District" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Tehsil" class="form-label"></label>
+                        <input asp-for="Tehsil" class="form-control" />
+                        <span asp-validation-for="Tehsil" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="City" class="form-label"></label>
+                        <input asp-for="City" class="form-control" />
+                        <span asp-validation-for="City" class="text-danger"></span>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="StartDate" class="form-label"></label>
+                            <input type="date" asp-for="StartDate" class="form-control" value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="EndDate" class="form-label"></label>
+                            <input type="date" asp-for="EndDate" class="form-control" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="ApplyStartDate" class="form-label"></label>
+                            <input type="date" asp-for="ApplyStartDate" class="form-control" value="@(Model.ApplyStartDate?.ToString("yyyy-MM-dd"))" />
+                            <span asp-validation-for="ApplyStartDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ApplyEndDate" class="form-label"></label>
+                            <input type="date" asp-for="ApplyEndDate" class="form-control" value="@(Model.ApplyEndDate?.ToString("yyyy-MM-dd"))" />
+                            <span asp-validation-for="ApplyEndDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ContactEmail" class="form-label"></label>
+                        <input asp-for="ContactEmail" class="form-control" readonly />
+                        <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CreatedBy" class="form-label"></label>
+                        <input asp-for="CreatedBy" class="form-control" />
+                        <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ContactMobile1" class="form-label"></label>
+                        <input asp-for="ContactMobile1" class="form-control" readonly />
+                        <span asp-validation-for="ContactMobile1" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ContactMobile2" class="form-label"></label>
+                        <input asp-for="ContactMobile2" class="form-control" />
+                        <span asp-validation-for="ContactMobile2" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input asp-for="Status" type="checkbox" class="form-check-input" />
+                        <label asp-for="Status" class="form-check-label"></label>
+                    </div>
+
+                    <div class="mb-3">
+                        <asp label class="form-label">Fair Logo</asp>
+                        <input asp-for="FairLogoPath" type="file" class="form-control mb-2" />
+                  
+                        @* Show logo as link if exists *@
+                        @if (!string.IsNullOrEmpty(Model.FairLogoPathString))
+                        {
+                            <div class="mb-2">
+                                <label>Current Logo:</label><br />
+                                <a href="@Model.FairLogoPathString" target="_blank" rel="noopener noreferrer"> View Logo</a>
+                            </div>
+                        }
+
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" id="updateBtn" class="btn btn-success btn-lg btn-hover">Update Fair</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Confirmation before submitting form
+        document.getElementById("updateBtn").addEventListener("click", function () {
+            if ($("#updateFairForm")) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to update this fair?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, update it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById("updateFairForm").submit();
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+<style>
+    .btn-hover:hover {
+        transform: scale(1.05);
+        transition: 0.3s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        transition: 0.3s;
+    }
+
+    a {
+        text-decoration: underline;
+        color: #0d6efd;
+    }
+
+        a:hover {
+            color: #0a58ca;
+        }
+</style>
+@{
+    Layout = "_LayoutSuperAdminDashbord";
+}

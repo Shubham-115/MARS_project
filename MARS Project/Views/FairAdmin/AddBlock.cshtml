@@ -1,0 +1,58 @@
+﻿@model MARS_Project.Models.FairAdmin.Block
+
+@{
+    ViewData["Title"] = "AddBlock";
+    Layout = "~/Views/Shared/_LayoutFairAdminDashbord.cshtml";
+}
+
+<h1>AddBlock</h1>
+
+@if (TempData["insertResult"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["insertResult"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddBlock">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group">
+                <label asp-for="SubSectorID" class="control-label"></label>
+                <input asp-for="SubSectorID" class="form-control" type="text" />
+                <span asp-validation-for="SubSectorID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BlockName" class="control-label"></label>
+                <input asp-for="BlockName" class="form-control" />
+                <span asp-validation-for="BlockName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BlockGroup" class="control-label"></label>
+                <input asp-for="BlockGroup" class="form-control" />
+                <span asp-validation-for="BlockGroup" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add Block" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Dashbord">Back to List</a>
+</div>
+

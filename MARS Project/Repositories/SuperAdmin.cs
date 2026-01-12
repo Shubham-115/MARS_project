@@ -84,7 +84,7 @@ namespace MARS_Project.Repositories
             }
         }
 
-       
+
 
         public async Task<int> SetFairStatus(SetFairStatus status)
         {
@@ -106,20 +106,111 @@ namespace MARS_Project.Repositories
                 }
             }
         }
-
-
-
-
-        public Task<string> UpdateFair()
+        public async Task<List<Createfair>> GetFairDetails(int FairID, string EmailID)
         {
-            throw new NotImplementedException();
+            List<Createfair> fairs = new List<Createfair>();
+
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                string query = @"SELECT * FROM dbo.TradeFair    WHERE ContactEmail = @ContactEmail AND FairID = @FairID";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@ContactEmail", EmailID);
+                    cmd.Parameters.AddWithValue("@FairID", FairID);
+
+                    await con.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            fairs.Add(new Createfair
+                            {
+                                Id = (int)reader.GetInt64(reader.GetOrdinal("FairID")),
+                                FairName = reader["FairName"]?.ToString() ?? "",
+                                Division = reader["Division"]?.ToString() ?? "",
+                                District = reader["District"]?.ToString() ?? "",
+                                Tehsil = reader["Tehsil"]?.ToString() ?? "",
+                                City = reader["City"]?.ToString() ?? "",
+                                StartDate = reader.IsDBNull(reader.GetOrdinal("StartDate")) ? null : reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.IsDBNull(reader.GetOrdinal("EndDate")) ? null  : reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                ApplyStartDate = reader.IsDBNull(reader.GetOrdinal("ApplyStartDate"))? null : reader.GetDateTime(reader.GetOrdinal("ApplyStartDate")),
+                                ApplyEndDate = reader.IsDBNull(reader.GetOrdinal("ApplyEndDate"))? null : reader.GetDateTime(reader.GetOrdinal("ApplyEndDate")),
+                                FairLogoPathString = reader["FairLogoPath"]?.ToString() ?? "",
+                                ContactMobile1 = reader["ContactMobile1"]?.ToString() ?? "",
+                                ContactMobile2 = reader["ContactMobile2"]?.ToString() ?? "",
+                                ContactEmail = reader["ContactEmail"]?.ToString() ?? "",
+                                Status = reader["Status"] != DBNull.Value && Convert.ToBoolean(reader["Status"]),
+                                CreatedBy = reader["CreatedBy"]?.ToString() ?? "",
+                                CreatedAt = reader["CreatedAt"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["CreatedAt"])
+                            });
+                        }
+                    }
+                }
+            }
+
+            return fairs;
+        }
+
+        public async Task<bool> UpdateFair(Createfair model)
+        {
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                string query = @"
+        UPDATE dbo.TradeFair
+        SET 
+            FairName = @FairName,
+            Division = @Division,
+            District = @District,
+            Tehsil = @Tehsil,
+            City = @City,
+            StartDate = @StartDate,
+            EndDate = @EndDate,
+            ApplyStartDate = @ApplyStartDate,
+            ApplyEndDate = @ApplyEndDate,
+            FairLogoPath = @FairLogoPath,
+            ContactMobile1 = @ContactMobile1,
+            ContactMobile2 = @ContactMobile2,
+            ContactEmail = @ContactEmail,
+            Status = @Status,
+            CreatedBy = @CreatedBy,
+            CreatedAt = @CreatedAt
+        WHERE FairID = @FairID;
+        ";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@FairID", model.Id);
+                    cmd.Parameters.AddWithValue("@FairName", model.FairName ?? "");
+                    cmd.Parameters.AddWithValue("@Division", model.Division ?? "");
+                    cmd.Parameters.AddWithValue("@District", model.District ?? "");
+                    cmd.Parameters.AddWithValue("@Tehsil", model.Tehsil ?? "");
+                    cmd.Parameters.AddWithValue("@City", model.City ?? "");
+
+                    cmd.Parameters.AddWithValue("@StartDate",model.StartDate);
+                    cmd.Parameters.AddWithValue("@EndDate",model.EndDate);
+                    cmd.Parameters.AddWithValue("@ApplyStartDate",model.ApplyStartDate);
+                    cmd.Parameters.AddWithValue("@ApplyEndDate",model.ApplyEndDate);
+
+                    cmd.Parameters.AddWithValue("@FairLogoPath", model.FairLogoPathString ?? "");
+                    cmd.Parameters.AddWithValue("@ContactMobile1", model.ContactMobile1 ?? "");
+                    cmd.Parameters.AddWithValue("@ContactMobile2", model.ContactMobile2 ?? "");
+                    cmd.Parameters.AddWithValue("@ContactEmail", model.ContactEmail ?? "");
+                    cmd.Parameters.AddWithValue("@Status", model.Status);
+                    cmd.Parameters.AddWithValue("@CreatedBy", model.CreatedBy ?? "");
+                    cmd.Parameters.AddWithValue("@CreatedAt", DateTime.Now);
+
+                    await con.OpenAsync();
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    return rows > 0;
+                }
+            }
         }
 
 
-
         public async Task<int> AddFairAdmin(SignUp signup)
-        {           
-
+        {
             using (SqlConnection con = new SqlConnection(_conn.Dbcs))
             {
                 await con.OpenAsync();
@@ -131,9 +222,9 @@ namespace MARS_Project.Repositories
                         // 1️⃣ Insert User
                         string userQuery = @"
                     INSERT INTO dbo.Users
-                    (MobileNo, EmailID, EmailVerified, MobileVerified, FirstName, LastName, Status, CreatedBy)
+                    (MobileNo, EmailID, EmailVerified, MobileVerified, FirstName, LastName, Status, CreatedBy,CreatedAt)
                     VALUES
-                    (@MobileNo, @EmailID, 0, 0, @FirstName, @LastName, 0, @CreatedBy);
+                    (@MobileNo, @EmailID, 0, 0, @FirstName, @LastName, 0, @CreatedBy,@CreatedAt);
                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
                         using SqlCommand userCmd = new SqlCommand(userQuery, con, transaction);
@@ -142,6 +233,7 @@ namespace MARS_Project.Repositories
                         userCmd.Parameters.Add("@FirstName", SqlDbType.VarChar).Value = signup.FirstName;
                         userCmd.Parameters.Add("@LastName", SqlDbType.VarChar).Value = signup.LastName;
                         userCmd.Parameters.Add("@CreatedBy", SqlDbType.VarChar).Value = signup.FirstName;
+                        userCmd.Parameters.Add("@CreatedAt", SqlDbType.VarChar).Value = DateTime.Now;
 
                         int userId = Convert.ToInt32(await userCmd.ExecuteScalarAsync());
 
@@ -195,6 +287,8 @@ namespace MARS_Project.Repositories
                 }
             }
         }
+
+
     }
 }
 
