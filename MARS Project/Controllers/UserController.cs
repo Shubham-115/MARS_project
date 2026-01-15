@@ -2,6 +2,7 @@
 using MARS_Project.CreateFilters;
 using MARS_Project.DataSecurity;
 using MARS_Project.Filters;
+using MARS_Project.Models;
 using MARS_Project.Models.Citizen;
 using MARS_Project.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -569,7 +570,7 @@ namespace MARS_Project.Controllers
 
         [SessionAuthorize]
         [RoleAuthorize("User")]
-        public IActionResult Dashbord()
+        public async Task<IActionResult> Dashbord()
         {
             // string Encryptemail = HttpContext.Session.GetString("EmailID");
             // string email = secure.Decript(Encryptemail);
@@ -594,7 +595,13 @@ namespace MARS_Project.Controllers
             }
             ViewBag.EmailID = email;
             HttpContext.Session.SetString("EmailID", email);
-            return View();
+
+            // 5️⃣ Fetch profile from DB (replace with your method)
+            Myprofile profile = new Myprofile { Email = email };
+            profile = await users.profile(profile); // async DB call returning Myprofile
+
+            // 6️⃣ Pass profile model to view
+            return View(profile);
         }
 
 

@@ -28,7 +28,7 @@ namespace MARS_Project.Controllers
         }
 
         [SessionAuthorize]
-        public IActionResult Dashbord()
+        public async Task<IActionResult> DashbordAsync()
         {
 
             string email = HttpContext.Session.GetString("EmailID");
@@ -55,9 +55,16 @@ namespace MARS_Project.Controllers
 
                 return RedirectToAction("PasswordChange", "User");
             }
+            // 4️⃣ Store email in ViewBag and session
             ViewBag.EmailID = email;
             HttpContext.Session.SetString("EmailID", email);
-            return View();
+
+            // 5️⃣ Fetch profile from DB (replace with your method)
+            Myprofile profile = new Myprofile { Email = email };
+            profile = await users.profile(profile); // async DB call returning Myprofile
+
+            // 6️⃣ Pass profile model to view
+            return View(profile);
         }
 
 

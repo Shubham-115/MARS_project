@@ -7,7 +7,7 @@
 @{
     ViewData["Title"] = "FairAdminDashbord";
 }
-<h1>Wel Come</h1>
+<h1>Welcome</h1>
 
 <div style="color:green"><p>@TempData["SuccessChange"]</p></div>
 
@@ -19,16 +19,17 @@
         Swal.fire({
             icon: 'success',
             title: 'Success',
-            text: '@TempData["Success"]'
+            text: '@TempData["SuccessChange"]'
         });
     </script>
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
 
-            <div class="card text-center shadow" style="height:350px;">
+<!-- Profile card (hidden by default) -->
+<div id="profileCard" class="container mt-8" style="display:none;">
+    <div class="row justify-content-lg-end">
+        <div class="col-md-4">
+            <div class="card text-center shadow" style="height:250px;">
                 <div class="card-header bg-primary text-white">
                     <h4>My Profile</h4>
                 </div>
@@ -37,12 +38,31 @@
                     <p><strong>Name:</strong> @Model.FName @Model.LName</p>
                     <p><strong>Email:</strong> @Model.Email</p>
                     <p><strong>Mobile:</strong> @Model.MobileNo</p>
-                    <p><strong>Role:</strong> @Model.role</p>
                     <p><strong>Created:</strong> @Model.createdAt.ToString("dd-MM-yyyy")</p>
-                </div>               
+                </div>
             </div>
-
         </div>
     </div>
 </div>
 
+<script>
+    const toggleBtn = document.getElementById('toggleProfileBtn');
+    const profileCard = document.getElementById('profileCard');
+
+    // Toggle profile visibility when button is clicked
+    toggleBtn.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent the click from triggering document click
+        if (profileCard.style.display === 'none') {
+            profileCard.style.display = 'block';
+        } else {
+            profileCard.style.display = 'none';
+        }
+    });
+
+    // Hide profile if user clicks anywhere else
+    document.addEventListener('click', function(event) {
+        if (!profileCard.contains(event.target) && event.target !== toggleBtn) {
+            profileCard.style.display = 'none';
+        }
+    });
+</script>

@@ -14,12 +14,13 @@ namespace MARS_Project.Repositories
 {
     public class AddFair : IAddFair
     {
+
         private readonly StringConnection _conn;
-        private readonly Users user;
-        public AddFair(StringConnection conn, Users user)
+       
+        public AddFair(StringConnection conn)
         {
             _conn = conn;
-            this.user = user;
+            
         }
         public async Task<string> AddBlock(Block block)
         {
@@ -124,40 +125,112 @@ namespace MARS_Project.Repositories
             }
         }
 
-        public async Task<Myprofile> GetProfileAsync(string email)
+        public async Task<Sector> getSetor(long SectorID, long FairID)
         {
+            List<Sector> sectors = new List<Sector>();
             using (SqlConnection con = new SqlConnection(_conn.Dbcs))
-            using (SqlCommand cmd = new SqlCommand("GetProfile", con))
             {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@EmailID", SqlDbType.NVarChar, 100).Value = email;
-
                 await con.OpenAsync();
+                SqlCommand cmd = new SqlCommand("GetSector", con);
+                cmd.CommandType= CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@SectorID",SectorID);
+                cmd.Parameters.AddWithValue("@FairID", FairID);
 
-                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+
+                var reader = await cmd.ExecuteReaderAsync();
+                while (reader.Read())
                 {
-                    if (await reader.ReadAsync())
+                    return new Sector
                     {
-                        return new Myprofile
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FName = reader.GetString(reader.GetOrdinal("FName")),
-                            LName = reader.GetString(reader.GetOrdinal("LName")),
-                            Email = reader.GetString(reader.GetOrdinal("EmailID")),
-                            MobileNo = reader.GetString(reader.GetOrdinal("MobileNo")),
-                            role = reader.GetString(reader.GetOrdinal("Role")),
-                            createdAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
-                        };
-                    }
+
+                        SectorID = (int)reader.GetInt64(reader.GetOrdinal("SectorID")),
+                        FairID = (int)reader.GetInt64(reader.GetOrdinal("FairID")),
+                        SectorName = reader.GetString(reader.GetOrdinal("SectorName")),
+                        SectorGroup = reader.GetString(reader.GetOrdinal("SectorGroup")),
+                        Area = reader.GetString(reader.GetOrdinal("Area")),
+                        Description = reader.GetString(reader.GetOrdinal("Description")),
+                        IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
+
+                    };
                 }
             }
-            return null; 
+            return null;
         }
 
-        public Task<Myprofile> profile(Myprofile myprofile)
+        public async Task<int> UpdateSector(Sector sector)
         {
-            throw new NotImplementedException();
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                await con.OpenAsync();
+                SqlCommand cmd = new SqlCommand("UpdateSector", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@SectorID", sector.SectorID);
+                cmd.Parameters.AddWithValue("@FairID", sector.FairID);
+                cmd.Parameters.AddWithValue("@SectorName", sector.SectorName);
+                cmd.Parameters.AddWithValue("@SectorGroup", sector.SectorGroup);
+                cmd.Parameters.AddWithValue("@Area", sector.Area);
+                cmd.Parameters.AddWithValue("@Description", sector.Description);
+                cmd.Parameters.AddWithValue("@IsActive", sector.IsActive);
+
+                int reader = await cmd.ExecuteNonQueryAsync();
+
+                return reader;
+            }
         }
+
+
+        public async Task<Subsector> getSubSetor(long SectorID, long SubSectorID)
+        {
+            List<Subsector> sectors = new List<Subsector>();
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                await con.OpenAsync();
+                SqlCommand cmd = new SqlCommand("GetSubSector", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@SectorID", SectorID);
+                cmd.Parameters.AddWithValue("@SubSectorID", SubSectorID);
+
+
+                var reader = await cmd.ExecuteReaderAsync();
+                while (reader.Read())
+                {
+                    return new Subsector
+                    {
+
+                        SectorID = (int)reader.GetInt64(reader.GetOrdinal("SectorID")),
+                        SubSectorID = (int)reader.GetInt64(reader.GetOrdinal("SubSectorID")),
+                        SubSectorName = reader.GetString(reader.GetOrdinal("SubSectorName")),
+                        GroupName = reader.GetString(reader.GetOrdinal("GroupName")),                       
+                        Description = reader.GetString(reader.GetOrdinal("Description")),
+                        IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"))
+
+                    };
+                }
+            }
+            return null;
+        }
+
+        public async Task<int> UpdateSubSector(Subsector Subsector)
+        {
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            {
+                await con.OpenAsync();
+                SqlCommand cmd = new SqlCommand("UpdateSubSector", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@SectorID", Subsector.SectorID);
+                cmd.Parameters.AddWithValue("@SubSectorID", Subsector.SubSectorID);
+                cmd.Parameters.AddWithValue("@SubSectorName", Subsector.SubSectorName);
+                cmd.Parameters.AddWithValue("@GroupName", Subsector.GroupName);                ;
+                cmd.Parameters.AddWithValue("@Description", Subsector.Description);
+                cmd.Parameters.AddWithValue("@IsActive", Subsector.IsActive);
+
+                int reader = await cmd.ExecuteNonQueryAsync();
+
+                return reader;
+            }
+        }
+
+       
     }
 }
 

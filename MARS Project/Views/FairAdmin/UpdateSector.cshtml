@@ -1,0 +1,117 @@
+﻿@using MARS_Project.Models.FairAdmin
+@model Sector
+
+@{
+    ViewData["Title"] = "Update Sector";
+    Layout = "~/Views/Shared/_LayoutFairAdminDashbord.cshtml";
+}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4 text-primary">Update Sector</h2>
+
+    <!-- TempData Message -->
+    @if (TempData["SectorUpdateMSG"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["SectorUpdateMSG"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Get Sector Form -->
+    @if (Model == null || Model.SectorID == 0)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                Enter Sector Details
+            </div>
+            <div class="card-body">
+                <form asp-action="UpdateSector" method="post">
+                    <input type="hidden" name="ActionType" value="GetSector" />
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="SectorID" class="form-label">Sector ID</label>
+                            <input type="number" name="Sector.SectorID" class="form-control" id="SectorID" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="FairID" class="form-label">Fair ID</label>
+                            <input type="number" name="Sector.FairID" class="form-control" id="FairID" required />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Get Sector</button>
+                </form>
+            </div>
+        </div>
+    }
+
+    <!-- Update Sector Form -->
+    <!-- Update Sector Form -->
+    @if (Model != null && Model.SectorID != 0)
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                Update Sector Information
+            </div>
+            <div class="card-body">
+                <form asp-action="UpdateSector" method="post">
+                    <input type="hidden" name="ActionType" value="UpdateSector" />
+                   
+                    <input type="hidden" name="Sector.FairID" value="@Model.FairID" />
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="SectorID" class="form-label">SectorID</label>
+                            <input type="text" name="Sector.SectorID" class="form-control" value="@Model.SectorID" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="SectorName" class="form-label">Sector Name</label>
+                            <input type="text" name="Sector.SectorName" class="form-control" id="SectorName" value="@Model.SectorName" required />
+                        </div>
+                       
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="SectorGroup" class="form-label">Sector Group</label>
+                            <input type="text" name="Sector.SectorGroup" class="form-control" id="SectorGroup" value="@Model.SectorGroup" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Area" class="form-label">Sector Area</label>
+                            <input type="text" name="Sector.Area" class="form-control" id="Area" value="@Model.Area" required />
+                        </div>
+                        <div class="col-md-12">
+                            <label for="Description" class="form-label">Description</label>
+                            <textarea name="Sector.Description" class="form-control" id="Description" rows="3">@Model.Description</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Correct checkbox binding -->
+                    <div class="form-check mb-3">
+                        <!-- Hidden input ensures false is sent if checkbox is unchecked -->
+                       
+                        <input type="checkbox" name="Sector.IsActive" class="form-check-input" id="IsActive" value="true" @(Model.IsActive ? "checked" : "") />
+                        <label for="IsActive" class="form-check-label">Active</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Update Sector</button>
+                </form>
+            </div>
+        </div>
+    }
+
+
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+    }
+
+    .card-header {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+</style>

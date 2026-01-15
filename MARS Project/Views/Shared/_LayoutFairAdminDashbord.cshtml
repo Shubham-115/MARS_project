@@ -91,7 +91,6 @@
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="CreateSector">Add</a></li>
                                         <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="UpdateSector">Update</a></li>
-                                        <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="DeleteSector">Delete</a></li>
                                     </ul>
                                 </li>
                                 <!-- SubSector -->
@@ -100,7 +99,6 @@
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="AddSubSector">Add</a></li>
                                         <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="UpdateSubSector">Update</a></li>
-                                        <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="DeleteSubSector">Delete</a></li>
                                     </ul>
                                 </li>
                                 <!-- Block -->
@@ -109,23 +107,22 @@
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="AddBlock">Add</a></li>
                                         <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="UpdateBlock">Update</a></li>
-                                        <li><a class="dropdown-item" asp-controller="FairAdmin" asp-action="DeleteBlock">Delete</a></li>
+                                       
                                     </ul>
                                 </li>
 
-                               
+
 
                             </ul>
                         </li>
 
-                     
+
                         <!-- Fair Admin -->
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="FairAdmin" asp-action="profile">
-                                <i class="bi bi-people"></i> FairAdmin
+                        <li class="nav-item position-relative">
+                            <a class="nav-link" href="javascript:void(0);" id="toggleProfileBtn">
+                                <i class="bi bi-people"></i> Profile
                             </a>
                         </li>
-
                         <!-- Fair Status -->
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="FairAdmin" asp-action="FairStatus">

@@ -25,38 +25,38 @@ namespace MARS_Project.Controllers
             addFair = addfair;
         }
         [SessionAuthorize]
-        public IActionResult Dashbord()
+        public async Task<IActionResult> Dashbord()
         {
-
+            // 1️⃣ Get email from session
             string email = HttpContext.Session.GetString("EmailID");
-            //if (email != null)
-            //{
-            //    return RedirectToAction("Dashbord");
-            //}
-           
-            if (HttpContext == null)
-                return RedirectToAction("Login", "User");
 
-
-            if (email == null)
+            // 2️⃣ Check if session exists
+            if (string.IsNullOrEmpty(email))
             {
-                TempData["Failed"] = " Please Enter Your Email ";
+                TempData["Failed"] = "Please enter your Email";
                 return RedirectToAction("Login", "User");
             }
 
+            // 3️⃣ Check if user needs to change password
             if (!users.UserStatus(email))
             {
-
-                TempData["ChangePassword"] = "Please Change your Password first";
+                TempData["ChangePassword"] = "Please change your password first";
                 HttpContext.Session.SetString("EmailID", email);
-
                 return RedirectToAction("PasswordChange", "User");
             }
+
+            // 4️⃣ Store email in ViewBag and session
             ViewBag.EmailID = email;
             HttpContext.Session.SetString("EmailID", email);
-            return View();
-     
+
+            // 5️⃣ Fetch profile from DB (replace with your method)
+            Myprofile profile = new Myprofile { Email = email };
+            profile = await users.profile(profile); // async DB call returning Myprofile
+
+            // 6️⃣ Pass profile model to view
+            return View(profile);
         }
+
         public IActionResult LogOut()
         {
             string email = HttpContext.Session.GetString("EmailID");
@@ -172,25 +172,73 @@ namespace MARS_Project.Controllers
             return RedirectToAction("AddBlock");
         }
 
-
-        public async Task<IActionResult> profile(Myprofile profile)
+        [HttpGet]
+        public IActionResult UpdateSector()
         {
-            string EmailID = HttpContext.Session.GetString("EmailID");
-            if (string.IsNullOrEmpty(EmailID))
-            {
-                return RedirectToAction("Login", "Users");
-            }
-
-            profile.Email = EmailID;
-            profile = await addFair.profile(profile);
-            if (profile != null)
-            {
-                return View(profile);
-            }
             return View();
         }
+        [HttpPost]
+        public async Task<IActionResult>UpdateSector(Sector sector , string ActionType)
+        {
+            if(ActionType == "GetSector")
+            {
+               var sectorDetails = await addFair.getSetor(sector.SectorID,sector.FairID);
+                if(sectorDetails == null)
+                {
+                    TempData["SectorUpdateMSG"] = "INvalid SectorID or FairID";
+                    return RedirectToAction("UpdateSector");
+                }
+                return View("UpdateSector",sectorDetails);
+            }
 
+            if(ActionType == "UpdateSector")
+            {
 
+                int updateResutlt = await addFair.UpdateSector(sector);
+                if (updateResutlt > 0)
+                {
+                    TempData["SectorUpdateMSG"] = "Sector Updated SuccessFully .....!";
+                    return RedirectToAction("UpdateSector");
+                }
+                return View();
+            }
+            TempData["SectorUpdateMSG"] = "INvalid SectorID or FairID";
+            return RedirectToAction("UpdateSector");
+        }
+
+        [HttpGet]
+        public IActionResult UpdateSubSector()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateSubSector(Subsector Subsector, string ActionType)
+        {
+            if (ActionType == "GetSubSector")
+            {
+                var sectorDetails = await addFair.getSubSetor(Subsector.SectorID, Subsector.SubSectorID);
+                if (sectorDetails == null)
+                {
+                    TempData["SubSectorUpdateMSG"] = "INvalid SectorID or SubSectorID";
+                    return RedirectToAction("UpdateSubSector");
+                }
+                return View("UpdateSubSector", sectorDetails);
+            }
+
+            if (ActionType == "UpdateSubSector")
+            {
+
+                int updateResutlt = await addFair.UpdateSubSector(Subsector);
+                if (updateResutlt > 0)
+                {
+                    TempData["SubSectorUpdateMSG"] = "Sector Updated SuccessFully .....!";
+                    return RedirectToAction("UpdateSubSector");
+                }
+                return View();
+            }
+            TempData["SubSectorUpdateMSG"] = "INvalid SectorID or FairID";
+            return RedirectToAction("UpdateSubSector");
+        }
 
 
     }

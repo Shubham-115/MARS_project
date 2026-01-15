@@ -10,7 +10,11 @@ namespace MARS_Project.Repositories
         public Task<string> AddBlock(Block block);
         public Task<long> GetFairID(string EmailID);
 
-        public Task<Myprofile> profile(Myprofile myprofile);
+      public Task<Sector> getSetor(long SectorID, long FairID);
+        public Task<int> UpdateSector(Sector sector);
+
+        public Task<Subsector> getSubSetor(long SectorID, long SubSectorID);
+        public Task<int> UpdateSubSector(Subsector sector);
     }
 }
 

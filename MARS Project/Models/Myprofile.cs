@@ -9,6 +9,6 @@
         public string LName { get; set; }
         public string MobileNo { get; set; }
         public DateTime createdAt { get; set; }
-        public string role { get; set; }
+        
     }
 }

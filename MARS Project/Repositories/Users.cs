@@ -1,5 +1,6 @@
 ﻿using Humanizer;
 using MARS_Project.Connection;
+using MARS_Project.Models;
 using MARS_Project.Models.Citizen;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
@@ -457,7 +458,34 @@ namespace MARS_Project.Repositories
 
         }
 
-       
+        public async Task<Myprofile> profile(Myprofile myprofile)
+        {
+            using (SqlConnection con = new SqlConnection(_conn.Dbcs))
+            using (SqlCommand cmd = new SqlCommand("GetProfile", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@EmailID", myprofile.Email);
+
+                await con.OpenAsync();
+
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return new Myprofile
+                        {
+                            Id = (int)reader.GetInt64(reader.GetOrdinal("UserID")),
+                            FName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LName = reader.GetString(reader.GetOrdinal("LastName")),
+                            Email = reader.GetString(reader.GetOrdinal("EmailID")),
+                            MobileNo = reader.GetString(reader.GetOrdinal("MobileNo")),
+                            createdAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt"))
+                        };
+                    }
+                }
+            }
+            return null;
+        }
     }
 }
 

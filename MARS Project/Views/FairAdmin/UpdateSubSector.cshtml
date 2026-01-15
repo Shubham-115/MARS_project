@@ -1,0 +1,124 @@
+﻿@using MARS_Project.Models.FairAdmin
+
+@model Subsector
+
+@{
+    ViewData["Title"] = "Update Subsector";
+    Layout = "~/Views/Shared/_LayoutFairAdminDashbord.cshtml";
+}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4 text-primary">Update Subsector</h2>
+
+    <!-- TempData Message -->
+    @if (TempData["SubSectorUpdateMSG"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["SubSectorUpdateMSG"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Get Subsector Form -->
+    @if (Model == null || Model.SubSectorID == 0)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                Enter Subsector Details
+            </div>
+            <div class="card-body">
+                <form asp-action="UpdateSubSector" method="post">
+                    <input type="hidden" name="ActionType" value="GetSubSector" />
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Sector ID</label>
+                            <input type="number" name="SectorID" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Subsector ID</label>
+                            <input type="number" name="SubSectorID" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Get Subsector</button>
+                </form>
+            </div>
+        </div>
+    }
+
+    <!-- Update Subsector Form -->
+    @if (Model != null && Model.SubSectorID != 0)
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                Update Subsector Information
+            </div>
+            <div class="card-body">
+                <form asp-action="UpdateSubSector" method="post">
+                    <input type="hidden" name="ActionType" value="UpdateSubSector" />
+
+                    <!-- IDs -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Sector ID</label>
+                            <input type="text" name="SectorID" class="form-control" value="@Model.SectorID" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Subsector ID</label>
+                            <input type="text" name="SubSectorID" class="form-control" value="@Model.SubSectorID" readonly />
+                        </div>
+                    </div>
+
+                    <!-- Name & Group -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Subsector Name</label>
+                            <input type="text" name="SubSectorName" class="form-control" value="@Model.SubSectorName" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Group Name</label>
+                            <input type="text" name="GroupName" class="form-control" value="@Model.GroupName" required />
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="Description" class="form-control" rows="3">@Model.Description</textarea>
+                    </div>
+
+                    <!-- IsActive (FIXED & CORRECT) -->
+                    <div class="form-check mb-3">
+                        <!-- Always send false -->
+                        <input type="hidden" name="IsActive" value="false" />
+
+                        <input type="checkbox"
+                               name="IsActive"
+                               class="form-check-input"
+                               id="IsActive"
+                               value="true"
+                               @(Model.IsActive ? "checked" : "") />
+
+                        <label class="form-check-label" for="IsActive">Active</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Update Subsector</button>
+                </form>
+            </div>
+        </div>
+    }
+
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+    }
+
+    .card-header {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+</style>

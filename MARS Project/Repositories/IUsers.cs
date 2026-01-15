@@ -1,4 +1,5 @@
-﻿using MARS_Project.Models.Citizen;
+﻿using MARS_Project.Models;
+using MARS_Project.Models.Citizen;
 
 namespace MARS_Project.Repositories
 {
@@ -57,10 +58,10 @@ namespace MARS_Project.Repositories
 
 
 
-       // public bool resetToken(string EmailID);
+        // public bool resetToken(string EmailID);
 
 
-
+        public Task<Myprofile> profile(Myprofile myprofile);
         public bool IsMobileExist(string MobileNo);
 
 
